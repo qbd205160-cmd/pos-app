@@ -158,53 +158,19 @@ async function gviz(id,sheet){
 async function loadAll(){
   setStatus('ld','جاري تحميل...');
   DB.dash=[];DB.tvf5=[];DB.tvf4=[];DB.stock=[];DB.sim55=[];DB.file=[];
-  
-  // تحميل كل شيت بـ timeout
-  async function loadSheet(id, sheet){
-    try{
-      var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json'+(sheet?'&sheet='+encodeURIComponent(sheet):'');
-      var ctrl=new AbortController();
-      var t=setTimeout(function(){ctrl.abort();},20000);
-      var r=await fetch(url,{signal:ctrl.signal});
-      clearTimeout(t);
-      var txt=await r.text();
-      var j=JSON.parse(txt.replace(/^[^(]+\(/,'').replace(/\);?\s*$/,''));
-      var cols=j.table.cols.map(function(c){return(c.label||c.id||'').trim();});
-      return(j.table.rows||[]).map(function(row){
-        var o={};(row.c||[]).forEach(function(cell,i){o[cols[i]]=cell&&cell.v!=null?String(cell.v).trim():'';});
-        return o;
-      }).filter(function(o){return Object.values(o).some(function(v){return v;});});
-    }catch(e){return [];}
-  }
-  
   try{
-    // تحميل dashboard أولاً
-    setLMsg('dashboard...');
-    DB.dash=await loadSheet(DASH);
-    var d2=await loadSheet(DASH,'ورقة1');
-    DB.dash=DB.dash.concat(d2);
+    DB.dash=await gviz(DASH);
+    try{var d2=await gviz(DASH,'ورقة1');DB.dash=DB.dash.concat(d2);}catch(e){}
     loaded=true;
-    setStatus('ok','⏳ '+DB.dash.length+' dashboard — يكمل التحميل...');
-    
-    // تحميل الباقي
-    setLMsg('stock وsim55...');
-    DB.stock=await loadSheet(STOCK);
-    DB.sim55=await loadSheet(SIM55);
-    
-    setLMsg('TVF...');
-    DB.tvf5=await loadSheet(TVF_ID);
-    DB.tvf4=await loadSheet(TVF_ID,'Form Responses 4');
-    
-    setLMsg('file...');
-    DB.file=await loadSheet(FILE_ID);
-    
-    buildFileMap();
-    buildDeviceDB();
-    var tvfTotal=DB.tvf5.length+DB.tvf4.length;
-    setStatus('ok','✅ جاهز — '+DB.dash.length+' dashboard · '+tvfTotal+' TVF · '+DB.stock.length+' stock');
-  }catch(e){
-    setStatus('ok','✅ جاهز (جزئي) — '+DB.dash.length+' dashboard');
-  }
+    setStatus('ok','⏳ '+DB.dash.length+' dashboard — يكمل...');
+    try{DB.stock=await gviz(STOCK);}catch(e){}
+    try{DB.sim55=await gviz(SIM55);}catch(e){}
+    try{DB.tvf5=await gviz(TVF_ID);}catch(e){}
+    try{DB.tvf4=await gviz(TVF_ID,'Form Responses 4');}catch(e){}
+    try{DB.file=await gviz(FILE_ID);}catch(e){}
+    buildFileMap();buildDeviceDB();
+    setStatus('ok','✅ جاهز — '+DB.dash.length+' dashboard · '+DB.tvf5.length+' TVF · '+DB.stock.length+' stock · '+DB.sim55.length+' sim55');
+  }catch(e){setStatus('err','فشل: '+e.message);}
 }
 
 // ── Build ICCID->MSISDN lookup map ───────────────────────────
