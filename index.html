@@ -156,46 +156,42 @@ async function gviz(id,sheet){
 }
 
 async function loadAll(){
-  setStatus('ld','جاري تحميل البيانات...');
+  setStatus('ld','جاري تحميل...');
   try{
-    setLMsg('تحميل dashboard...');
-    var dashResults=await Promise.all([
+    // تحميل dashboard وstock وsim55 أولاً
+    setLMsg('تحميل البيانات الرئيسية...');
+    var mainResults=await Promise.all([
       gviz(DASH).catch(function(){return [];}),
-      gviz(DASH,'ورقة1').catch(function(){return [];})
+      gviz(DASH,'ورقة1').catch(function(){return [];}),
+      gviz(STOCK).catch(function(){return [];}),
+      gviz(SIM55).catch(function(){return [];})
     ]);
-    DB.dash=dashResults[0].concat(dashResults[1]);
+    DB.dash=mainResults[0].concat(mainResults[1]);
+    DB.stock=mainResults[2];
+    DB.sim55=mainResults[3];
+    DB.tvf5=[];DB.tvf4=[];DB.file=[];
+    loaded=true;
+    buildFileMap();
+    buildDeviceDB();
+    setStatus('ok','جاهز — '+DB.dash.length+' dashboard · '+DB.stock.length+' stock (TVF يحمّل...)');
     
-    // تحميل كل شيتات TVF بالتوازي
-    DB.tvf5=[];DB.tvf4=[];
-    setLMsg('تحميل TVF...');
+    // تحميل TVF في الخلفية
     var tvfResults=await Promise.all([
       gviz(TVF_ID,'Form Responses 1').catch(function(){return [];}),
       gviz(TVF_ID,'Form Responses 2').catch(function(){return [];}),
       gviz(TVF_ID,'Form Responses 4').catch(function(){return [];}),
       gviz(TVF_ID,'Sheet6').catch(function(){return [];}),
       gviz(TVF_ID,'Sheet7').catch(function(){return [];}),
-      gviz(TVF_ID,'Sheet8').catch(function(){return [];})
+      gviz(TVF_ID,'Sheet8').catch(function(){return [];}),
+      gviz(FILE_ID).catch(function(){return [];})
     ]);
     DB.tvf5=tvfResults[0].concat(tvfResults[1]).concat(tvfResults[3]).concat(tvfResults[4]).concat(tvfResults[5]);
     DB.tvf4=tvfResults[2];
-    
-    setLMsg('تحميل stock...');
-    try{DB.stock=await gviz(STOCK);}catch(e){DB.stock=[];}
-    
-    setLMsg('تحميل sim55...');
-    try{DB.sim55=await gviz(SIM55);}catch(e){DB.sim55=[];}
-    
-    setLMsg('تحميل file (ICCID/MSISDN)...');
-    try{DB.file=await gviz(FILE_ID);}catch(e){DB.file=[];}
-    
-    // بناء خريطة ICCID->MSISDN
+    DB.file=tvfResults[6];
     buildFileMap();
-    // بناء قاعدة بيانات الأجهزة
     buildDeviceDB();
-    
-    loaded=true;
     var tvfTotal=DB.tvf5.length+DB.tvf4.length;
-    setStatus('ok','جاهز — '+DB.dash.length+' dashboard · '+tvfTotal+' TVF · '+DB.stock.length+' stock · '+DB.sim55.length+' sim55 · '+DB.file.length+' file');
+    setStatus('ok','✅ جاهز — '+DB.dash.length+' dashboard · '+tvfTotal+' TVF · '+DB.stock.length+' stock · '+DB.sim55.length+' sim55');
   }catch(e){setStatus('err','فشل: '+e.message);}
 }
 
