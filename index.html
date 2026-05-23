@@ -158,25 +158,27 @@ async function gviz(id,sheet){
 async function loadAll(){
   setStatus('ld','جاري تحميل...');
   try{
-    setLMsg('تحميل البيانات...');
+    // تحميل كل الشيتات معاً
     var results=await Promise.all([
       gviz(DASH).catch(function(){return [];}),
       gviz(DASH,'ورقة1').catch(function(){return [];}),
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
       gviz(TVF_ID).catch(function(){return [];}),
+      gviz(TVF_ID,'Form Responses 4').catch(function(){return [];}),
       gviz(FILE_ID).catch(function(){return [];})
     ]);
     DB.dash=results[0].concat(results[1]);
     DB.stock=results[2];
     DB.sim55=results[3];
     DB.tvf5=results[4];
-    DB.tvf4=[];
-    DB.file=results[5];
+    DB.tvf4=results[5];
+    DB.file=results[6];
     buildFileMap();
     buildDeviceDB();
     loaded=true;
-    setStatus('ok','✅ جاهز — '+DB.dash.length+' dashboard · '+DB.tvf5.length+' TVF · '+DB.stock.length+' stock · '+DB.sim55.length+' sim55');
+    var tvfTotal=DB.tvf5.length+DB.tvf4.length;
+    setStatus('ok','✅ جاهز — '+DB.dash.length+' dashboard · '+tvfTotal+' TVF · '+DB.stock.length+' stock · '+DB.sim55.length+' sim55');
   }catch(e){setStatus('err','فشل: '+e.message);}
 }
 
