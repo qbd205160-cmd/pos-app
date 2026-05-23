@@ -139,10 +139,7 @@ var loaded=false;
 // ── Load GViz ────────────────────────────────────────────────
 async function gviz(id,sheet){
   var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json'+(sheet?'&sheet='+encodeURIComponent(sheet):'');
-  var controller=new AbortController();
-  var timeout=setTimeout(function(){controller.abort();},15000);
-  var r=await fetch(url,{signal:controller.signal});
-  clearTimeout(timeout);
+  var r=await fetch(url);
   var t=await r.text();
   var j=JSON.parse(t.replace(/^[^(]+\(/,'').replace(/\);?\s*$/,''));
   var cols=j.table.cols.map(function(c){return(c.label||c.id||'').trim();});
