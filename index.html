@@ -159,29 +159,25 @@ async function loadAll(){
   setStatus('ld','جاري تحميل البيانات...');
   try{
     setLMsg('تحميل dashboard...');
-    var dash1=await gviz(DASH);
-    var dash2=[];
-    try{dash2=await gviz(DASH,'ورقة1');}catch(e){}
-    DB.dash=dash1.concat(dash2);
+    var dashResults=await Promise.all([
+      gviz(DASH).catch(function(){return [];}),
+      gviz(DASH,'ورقة1').catch(function(){return [];})
+    ]);
+    DB.dash=dashResults[0].concat(dashResults[1]);
     
-    // تحميل كل شيتات TVF
+    // تحميل كل شيتات TVF بالتوازي
     DB.tvf5=[];DB.tvf4=[];
-    var tvfSheets=[
-      {name:'Form Responses 1',type:'r5'},
-      {name:'Form Responses 2',type:'r5'},
-      {name:'Form Responses 4',type:'r4'},
-      {name:'Sheet6',type:'r5'},
-      {name:'Sheet7',type:'r5'},
-      {name:'Sheet8',type:'r5'}
-    ];
-    for(var si2=0;si2<tvfSheets.length;si2++){
-      setLMsg('تحميل TVF: '+tvfSheets[si2].name+'...');
-      try{
-        var rows=await gviz(TVF_ID,tvfSheets[si2].name);
-        if(tvfSheets[si2].type==='r4'){DB.tvf4=DB.tvf4.concat(rows);}
-        else{DB.tvf5=DB.tvf5.concat(rows);}
-      }catch(e){}
-    }
+    setLMsg('تحميل TVF...');
+    var tvfResults=await Promise.all([
+      gviz(TVF_ID,'Form Responses 1').catch(function(){return [];}),
+      gviz(TVF_ID,'Form Responses 2').catch(function(){return [];}),
+      gviz(TVF_ID,'Form Responses 4').catch(function(){return [];}),
+      gviz(TVF_ID,'Sheet6').catch(function(){return [];}),
+      gviz(TVF_ID,'Sheet7').catch(function(){return [];}),
+      gviz(TVF_ID,'Sheet8').catch(function(){return [];})
+    ]);
+    DB.tvf5=tvfResults[0].concat(tvfResults[1]).concat(tvfResults[3]).concat(tvfResults[4]).concat(tvfResults[5]);
+    DB.tvf4=tvfResults[2];
     
     setLMsg('تحميل stock...');
     try{DB.stock=await gviz(STOCK);}catch(e){DB.stock=[];}
