@@ -157,28 +157,36 @@ async function gviz(id,sheet){
 
 async function loadAll(){
   setStatus('ld','جاري تحميل...');
+  DB.dash=[];DB.tvf5=[];DB.tvf4=[];DB.stock=[];DB.sim55=[];DB.file=[];
   try{
-    // تحميل كل الشيتات معاً
-    var results=await Promise.all([
-      gviz(DASH).catch(function(){return [];}),
-      gviz(DASH,'ورقة1').catch(function(){return [];}),
+    // المرحلة 1: dashboard فقط (سريع جداً)
+    setLMsg('تحميل dashboard...');
+    DB.dash=await gviz(DASH).catch(function(){return [];});
+    var dash2=await gviz(DASH,'ورقة1').catch(function(){return [];});
+    DB.dash=DB.dash.concat(dash2);
+    loaded=true;
+    setStatus('ok','⏳ '+DB.dash.length+' dashboard | جاري تحميل الباقي...');
+    
+    // المرحلة 2: الباقي في الخلفية
+    Promise.all([
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
       gviz(TVF_ID).catch(function(){return [];}),
       gviz(TVF_ID,'Form Responses 4').catch(function(){return [];}),
       gviz(FILE_ID).catch(function(){return [];})
-    ]);
-    DB.dash=results[0].concat(results[1]);
-    DB.stock=results[2];
-    DB.sim55=results[3];
-    DB.tvf5=results[4];
-    DB.tvf4=results[5];
-    DB.file=results[6];
-    buildFileMap();
-    buildDeviceDB();
-    loaded=true;
-    var tvfTotal=DB.tvf5.length+DB.tvf4.length;
-    setStatus('ok','✅ جاهز — '+DB.dash.length+' dashboard · '+tvfTotal+' TVF · '+DB.stock.length+' stock · '+DB.sim55.length+' sim55');
+    ]).then(function(r){
+      DB.stock=r[0];
+      DB.sim55=r[1];
+      DB.tvf5=r[2];
+      DB.tvf4=r[3];
+      DB.file=r[4];
+      buildFileMap();
+      buildDeviceDB();
+      setStatus('ok','✅ جاهز — '+DB.dash.length+' · '+DB.tvf5.length+' TVF · '+DB.stock.length+' stock · '+DB.sim55.length+' sim55');
+    }).catch(function(e){
+      setStatus('ok','✅ جاهز (dashboard فقط) — '+DB.dash.length+' سجل');
+    });
+    
   }catch(e){setStatus('err','فشل: '+e.message);}
 }
 
