@@ -367,7 +367,13 @@ function byName(q) {
   D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].tvf.push(r);}});
   D.sim.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].si.push(r);}});
   if (!Object.keys(byN).length) {noRes(q);return;}
-  var list=Object.values(byN).sort(function(a,b){return b.sc-a.sc;});
+  var list=Object.values(byN).sort(function(a,b){
+    // ترتيب بالنتيجة أولاً ثم بالتاريخ
+    if(Math.abs(b.sc-a.sc)>0.05)return b.sc-a.sc;
+    var ta=a.dash.length?pd(cv(a.dash[0],'submittedAt')):new Date(0);
+    var tb=b.dash.length?pd(cv(b.dash[0],'submittedAt')):new Date(0);
+    return tb-ta;
+  });
   var best=list[0].sc;
   list=list.filter(function(x){return x.sc>=best*0.75;});
   list.forEach(function(br){
