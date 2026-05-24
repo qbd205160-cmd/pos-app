@@ -306,7 +306,10 @@ function setTab(t) {
 function go() {
   var q = (document.getElementById('si').value||'').trim();
   if (!q) return;
-  if (!loaded) { alert('انتظر حتى يكتمل التحميل'); return; }
+  if (!loaded) { 
+    setSt('ld','جاري التحميل — سيبحث تلقائياً عند الانتهاء...');
+    return; 
+  }
   showLd(true);
   setTimeout(function(){
     var ql=q.toLowerCase();
