@@ -591,6 +591,22 @@ function buildRepFilters(){
   sel.value=cur;
 }
 
+// تحويل التاريخ لصيغة YYYY-MM-DD للمقارنة
+function pdStr(s){
+  if(!s)return '';
+  s=String(s).trim();
+  var gm=s.match(/^Date\((\d+),(\d+),(\d+)\)/);
+  if(gm){var mo=parseInt(gm[2])+1;return gm[1]+'-'+(mo<10?'0':'')+mo+'-'+(parseInt(gm[3])<10?'0':'')+gm[3];}
+  var ar={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+  for(var k in ar)s=s.split(k).join(ar[k]);
+  s=s.replace(/‏/g,'').trim();
+  var m=s.match(/(\d+)\/(\d+)\/(\d+)/);
+  if(!m)return '';
+  var d=parseInt(m[1]),mo=parseInt(m[2]),y=parseInt(m[3]);
+  if(y<100){var tmp=y;y=d;d=tmp;}
+  return y+'-'+(mo<10?'0':'')+mo+'-'+(d<10?'0':'')+d;
+}
+
 function doRep(){
   if(!loaded)return;
   var st=document.getElementById('rSt').value;
@@ -598,8 +614,9 @@ function doRep(){
   var fr=document.getElementById('rFr').value;
   var to=document.getElementById('rTo').value;
   var srch=(document.getElementById('rSrch').value||'').toLowerCase();
-  var frDate=fr?new Date(fr):null;
-  var toDate=to?new Date(to+'T23:59:59'):null;
+  // تحويل فلاتر التاريخ لصيغة مقارنة بسيطة
+  var frStr=fr||'';   // 'YYYY-MM-DD'
+  var toStr=to||'';
 
   // كل التاسكات من dashboard + TVF
   var all=[];
@@ -615,9 +632,10 @@ function doRep(){
   var rows=all.filter(function(r){
     if(st&&r.status!==st)return false;
     if(te&&r.tech!==te)return false;
-    var d=pd(r.date);
-    if(frDate&&d<frDate)return false;
-    if(toDate&&d>toDate)return false;
+    // مقارنة التاريخ كـ string بعد تحويله
+    var ds=pdStr(r.date);
+    if(frStr&&ds&&ds<frStr)return false;
+    if(toStr&&ds&&ds>toStr)return false;
     if(srch&&!(r.name+' '+r.tech+' '+r.dev+' '+r.note+' '+r.reason).toLowerCase().includes(srch))return false;
     return true;
   }).sort(function(a,b){return pd(b.date)-pd(a.date);});
