@@ -487,10 +487,7 @@ function byName(q) {
       var s=ns(cv(r,'رقم SIM كارت POS'));
       if(s.length>6)sims[s]=true;
     });
-    br.tvf4.forEach(function(r) {
-      var d=nd(cv(r,'POS number')||fdev(r));
-      if(d.length>4)devs[d]=true;
-    });
+
     // إضافة TVF5
     br.tvf = br.tvf.concat(D.tvf.filter(function(r) {
       var d=nd(fdev(r)||cv(r,'رقم الجهاز'));
