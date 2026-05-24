@@ -146,7 +146,7 @@ var STOCK='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
 var SIM55='1Fwyln1_-ogHjvfnoQnI2tdXTWGRosThZofgjWU2TSl8';
 var FILE='1m6AHs66KJ5RbvQUu5vvM0HGmNalMwElS7LBlk8yVEJA';
 var TRACKING='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
-var TRACK_SHEET='tracking';
+var TRACK_SHEET='tracking'; // tab name in stock spreadsheet
 var TVF4='Form Responses 4';
 
 var D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],file:[],track:[]};
@@ -591,8 +591,10 @@ function renderMainCard(br){
   }
 
   // Tracking - date|vs|msid|return|team|rest name|email|device type|ID|invose|in|out|stock|amount|note
-  var devKey=data&&data.dev?data.dev.toUpperCase():'';
+  var devKey='';
+  if(data&&data.dev&&data.dev.length>3)devKey=data.dev.toUpperCase();
   if(!devKey&&t)devKey=(cv(t,'رقم جهاز POS')||'').toUpperCase();
+  if(!devKey&&br.tvf&&br.tvf.length)devKey=(fdev(br.tvf[0])||'').toUpperCase();
   var trackRows=devKey?D.track.filter(function(r){
     var v=(cv(r,'vs')||'').trim().toUpperCase();
     return v&&v===devKey;
@@ -651,7 +653,7 @@ function renderMainCard(br){
 }
 
 function renderMainCard2(data){
-  return renderMainCard({name:data.name,dash:data.dash,tvf:data.tvf||[],stk:data.stk?[data.stk]:[],si:data.si5?[data.si5]:[]});
+  return renderMainCard({name:data.name,dev:data.dev||'',dash:data.dash,tvf:data.tvf||[],stk:data.stk?[data.stk]:[],si:data.si5?[data.si5]:[]});
 }
 
 // ── Reports ───────────────────────────────────────────────────
