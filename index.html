@@ -249,17 +249,27 @@ function fdev(r) {
 // مفتاح توحيد الاسم - يزيل الفروق الإملائية
 function normKey(n) {
   if (!n) return '';
-  return n
-    .replace(/[ً-ٟ]/g, '')  // إزالة التشكيل
-    .replace(/[إأآ]/g, 'ا')           // توحيد الألف
-    .replace(/[هة]/g, 'ه')            // توحيد التاء المربوطة والهاء
-    .replace(/ى/g, 'ي')               // توحيد الياء
-    .replace(/\s+/g, ' ')             // مسافات متعددة
-    .replace(/^(ال|شارع\s+)/g, '')   // إزالة ال التعريف وكلمة شارع
+  var s = n
+    .replace(/[ً-ٟ]/g, '')
+    .replace(/[إأآ]/g, 'ا')
+    .replace(/[هة]/g, 'ه')
+    .replace(/ى/g, 'ي')
+    .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
-}
 
+  // توحيد كلمة chicken
+  s = s.replace(/تشيكن|تشكين|تشكن|جكن|جيكن|چكن|چيكن/g, 'جكن');
+
+  // توحيد المناطق - إزالة ال التعريف وتوحيد التهجئة
+  s = s.replace(/ال/g, '');
+  s = s.replace(/شارع\s*/g, '');
+
+  // توحيد نهايات الكلمات (ه = ة)
+  s = s.replace(/(\w)ه(\s|$)/g, '$1ه$2');
+
+  return s.trim();
+}
 
 function score(name,q) {
   name=(name||'').toLowerCase().trim(); q=(q||'').toLowerCase().trim();
