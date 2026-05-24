@@ -250,25 +250,19 @@ function fdev(r) {
 function normTech(t) {
   if (!t) return '';
   t = t.trim();
-  // أسماء متشابهة
-  var map = {
-    'علي مصطفى':  'علي متولي',
-    'علي مصطفي':  'علي متولي',
-    'على متولي':  'علي متولي',
-    'على مصطفى':  'علي متولي',
-    'محمد زاهد':  'محمد غزوان',
-    'محمد':       'محمد غزوان',
-    'مصطفى':      'مصطفى',
-    'mustafa':    'مصطفى',
-    'mohammed':   'محمد غزوان',
-    'laheeb':     'لهيب',
-    'qaiser':     'قيصر',
-    'qaesar':     'قيصر',
-  };
   var tl = t.toLowerCase();
-  for (var k in map) {
-    if (tl === k.toLowerCase()) return map[k];
-  }
+  // علي متولي = علي مصطفى (نفس الشخص)
+  if (tl.includes('علي') && (tl.includes('مصطفى') || tl.includes('مصطفي') || tl.includes('متولي') || tl.includes('باريس'))) return 'علي متولي';
+  // محمد غزوان
+  if (tl.includes('محمد') && (tl.includes('غزوان') || tl.includes('زاهد') || tl.includes('العنبر'))) return 'محمد غزوان';
+  // قيصر
+  if (tl.includes('قيصر') || tl === 'qaiser' || tl === 'qaesar') return 'قيصر';
+  // لهيب
+  if (tl.includes('لهيب') || tl === 'laheeb') return 'لهيب';
+  // مصطفى
+  if (tl === 'مصطفى' || tl === 'مصطفي' || tl === 'mustafa') return 'مصطفى';
+  // محمد (بدون لقب)
+  if (tl === 'mohammed' || tl === 'محمد') return 'محمد غزوان';
   return t;
 }
 
