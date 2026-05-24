@@ -246,6 +246,32 @@ function fdev(r) {
   });
   return v;
 }
+// توحيد أسماء الفنيين
+function normTech(t) {
+  if (!t) return '';
+  t = t.trim();
+  // أسماء متشابهة
+  var map = {
+    'علي مصطفى':  'علي متولي',
+    'علي مصطفي':  'علي متولي',
+    'على متولي':  'علي متولي',
+    'على مصطفى':  'علي متولي',
+    'محمد زاهد':  'محمد غزوان',
+    'محمد':       'محمد غزوان',
+    'مصطفى':      'مصطفى',
+    'mustafa':    'مصطفى',
+    'mohammed':   'محمد غزوان',
+    'laheeb':     'لهيب',
+    'qaiser':     'قيصر',
+    'qaesar':     'قيصر',
+  };
+  var tl = t.toLowerCase();
+  for (var k in map) {
+    if (tl === k.toLowerCase()) return map[k];
+  }
+  return t;
+}
+
 function score(name,q) {
   name=(name||'').toLowerCase().trim(); q=(q||'').toLowerCase().trim();
   if (!name||!q) return 0;
@@ -583,8 +609,8 @@ function renderNameCard(br) {
 // ── Reports ───────────────────────────────────────────────────
 function buildRepFilters(){
   var techs=new Set();
-  D.dash.forEach(function(r){var t=cv(r,'اسم الموظف المسؤول');if(t&&t.length>1)techs.add(t);});
-  D.tvf.concat(D.tvf4).forEach(function(r){var t=cv(r,'اسم الوظف','اسم الموظف المسؤول');if(t&&t.length>1)techs.add(t);});
+  D.dash.forEach(function(r){var t=normTech(cv(r,'اسم الموظف المسؤول'));if(t&&t.length>1)techs.add(t);});
+  D.tvf.concat(D.tvf4).forEach(function(r){var t=normTech(cv(r,'اسم الوظف','اسم الموظف المسؤول'));if(t&&t.length>1)techs.add(t);});
   var sel=document.getElementById('rTe'); var cur=sel.value;
   sel.innerHTML='<option value="">الكل</option>';
   Array.from(techs).sort().forEach(function(t){sel.innerHTML+='<option>'+t+'</option>';});
@@ -622,11 +648,11 @@ function doRep(){
   var all=[];
   D.dash.forEach(function(r){
     var n=cv(r,'اسم المطعم'); if(!n)return;
-    all.push({name:n,date:cv(r,'submittedAt'),tech:cv(r,'اسم الموظف المسؤول'),status:cv(r,'status'),dev:cv(r,'رقم جهاز POS'),sim:toMS(cv(r,'رقم SIM كارت POS')),addr:cv(r,'العنوان'),reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظات'),apps:cv(r,'منافس'),simst:cv(r,'حالة SIM'),src:'dash'});
+    all.push({name:n,date:cv(r,'submittedAt'),tech:normTech(cv(r,'اسم الموظف المسؤول')),status:cv(r,'status'),dev:cv(r,'رقم جهاز POS'),sim:toMS(cv(r,'رقم SIM كارت POS')),addr:cv(r,'العنوان'),reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظات'),apps:cv(r,'منافس'),simst:cv(r,'حالة SIM'),src:'dash'});
   });
   D.tvf.concat(D.tvf4).forEach(function(r){
     var n=cv(r,'اسم المطعم','اسم الوظف'); if(!n)return;
-    all.push({name:n,date:cv(r,'Timestamp','كرل دايت'),tech:cv(r,'اسم الوظف','اسم الموظف المسؤول'),status:'',dev:fdev(r)||cv(r,'POS number','رقم الجهاز'),sim:toMS(cv(r,'رقم السم كارت','SIM number')),addr:'',reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظة','ملاحظات'),apps:'',simst:'',src:'TVF'});
+    all.push({name:n,date:cv(r,'Timestamp','كرل دايت'),tech:normTech(cv(r,'اسم الوظف','اسم الموظف المسؤول')),status:'',dev:fdev(r)||cv(r,'POS number','رقم الجهاز'),sim:toMS(cv(r,'رقم السم كارت','SIM number')),addr:'',reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظة','ملاحظات'),apps:'',simst:'',src:'TVF'});
   });
 
   var rows=all.filter(function(r){
