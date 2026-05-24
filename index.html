@@ -229,8 +229,14 @@ function nd(s) { return (s||'').toLowerCase().replace(/[\s\-]/g,''); }
 function ns(s) { return (s||'').replace(/\D/g,'').replace(/^00964/,'').replace(/^964/,'').replace(/^0/,'').slice(-9); }
 function pd(s) {
   if (!s) return new Date(0);
-  s = String(s).replace(/[٠-٩]/g, function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);}).trim();
-  var m = s.match(/(\d+)\/(\d+)\/(\d+)/); if (!m) return new Date(0);
+  s = String(s).trim();
+  // Handle gviz Date(year,month,day) format - months are 0-indexed
+  var gm = s.match(/^Date\((\d+),(\d+),(\d+)\)/);
+  if (gm) return new Date(parseInt(gm[1]), parseInt(gm[2]), parseInt(gm[3]));
+  // Handle Arabic numerals
+  s = s.replace(/[٠-٩]/g, function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);});
+  var m = s.match(/(\d+)\/(\d+)\/(\d+)/);
+  if (!m) return new Date(0);
   var y=parseInt(m[3]),mo=parseInt(m[2]),d=parseInt(m[1]);
   if (y<100){var tmp=y;y=d;d=tmp;}
   var t=s.match(/(\d+):(\d+)/),h=t?parseInt(t[1]):0,mn=t?parseInt(t[2]):0;
