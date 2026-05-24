@@ -178,9 +178,17 @@ async function loadAll(){
   D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],file:[],track:[]};
   loaded=false;
   try{
-    var r=await Promise.all([
+    // خطوة 1: dashboard فقط (أسرع شيء)
+    var d=await Promise.all([
       gviz(DASH).catch(function(){return [];}),
-      gviz(DASH,'ورقة1').catch(function(){return [];}),
+      gviz(DASH,'ورقة1').catch(function(){return [];})
+    ]);
+    D.dash=d[0].concat(d[1]);
+    loaded=true;
+    setSt('ok','⏳ جاهز للبحث — '+D.dash.length+' dashboard (يكمل...)');
+
+    // خطوة 2: الباقي — لا ننتظرها لأن loaded=true بالفعل
+    var r=await Promise.all([
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
       gviz(TVF).catch(function(){return [];}),
@@ -188,16 +196,10 @@ async function loadAll(){
       gviz(FILE).catch(function(){return [];}),
       gviz(TRACKING,TRACK_SHEET).catch(function(){return [];})
     ]);
-    D.dash=r[0].concat(r[1]);
-    D.stock=r[2];
-    D.sim=r[3];
-    D.tvf=r[4];
-    D.tvf4=r[5];
-    D.file=r[6];
-    D.track=r[7];
+    D.stock=r[0]; D.sim=r[1]; D.tvf=r[2];
+    D.tvf4=r[3]; D.file=r[4]; D.track=r[5];
     buildICCID();
-    loaded=true;
-    setSt('ok','✅ جاهز — '+D.dash.length+' dashboard · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim55 · '+D.track.length+' tracking');
+    setSt('ok','✅ '+D.dash.length+' dash · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim · '+D.track.length+' track');
   }catch(e){setSt('err','فشل: '+e.message);}
 }
 
