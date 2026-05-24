@@ -246,6 +246,74 @@ function fdev(r) {
   });
   return v;
 }
+// توحيد أسماء المناطق
+function normArea(s) {
+  if (!s) return '';
+  s = s.trim()
+    // إزالة ال التعريف
+    .replace(/^ال/, '')
+    // توحيد التاء المربوطة والهاء
+    .replace(/[هة]$/, 'ة')
+    // توحيد الألف
+    .replace(/[إأآا]/g, 'ا')
+    // إزالة المسافات
+    .toLowerCase().trim();
+  // قاموس المناطق المتشابهة
+  var map = {
+    'زيون':  'زيونة',
+    'زيونه': 'زيونة',
+    'زيونة': 'زيونة',
+    'منصور': 'المنصور',
+    'سيدي':  'السيدية',
+    'سيديه': 'السيدية',
+    'سيدية': 'السيدية',
+    'سيديا': 'السيدية',
+    'عامري': 'العامرية',
+    'عامريه':'العامرية',
+    'عامرية':'العامرية',
+    'فلسطين':'شارع فلسطين',
+    'شارع فلسطين':'شارع فلسطين',
+    'كرده':  'الكرادة',
+    'كراده': 'الكرادة',
+    'كرادة': 'الكرادة',
+    'جادري': 'الجادرية',
+    'جادريه':'الجادرية',
+    'جادرية':'الجادرية',
+    'جامعه': 'الجامعة',
+    'جامعة': 'الجامعة',
+    'عدل':   'حي العدل',
+    'اعظمي': 'الاعظمية',
+    'اعظمية':'الاعظمية',
+    'اعظميه':'الاعظمية',
+    'روضه':  'الروضة',
+    'روضة':  'الروضة',
+    'بياع':  'البياع',
+    'شعب':   'حي الشعب',
+    'هاشمي': 'الهاشمية',
+    'امين':  'امين',
+    'خضراء': 'الخضراء',
+    'خضرا':  'الخضراء',
+    'دوره':  'الدورة',
+    'دورة':  'الدورة',
+    'مدينه': 'المدينة',
+    'مدينة': 'المدينة',
+  };
+  // بحث في القاموس
+  for (var k in map) {
+    if (s.includes(k)) return map[k];
+  }
+  return s;
+}
+
+// توحيد اسم الفرع الكامل
+function normName(n) {
+  if (!n) return '';
+  var parts = n.split(/[\/\-\|]/);
+  var brand = parts[0].trim();
+  var area  = parts.length > 1 ? normArea(parts.slice(1).join(' ')) : '';
+  return area ? brand + ' / ' + area : brand;
+}
+
 function score(name,q) {
   name=(name||'').toLowerCase().trim(); q=(q||'').toLowerCase().trim();
   if (!name||!q) return 0;
@@ -369,9 +437,11 @@ function byName(q) {
     if(!n)return;
     var s=score(n,q);
     if(s>0.3){
-      if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};
-      byN[n].dash.push(r);
-      if(s>byN[n].sc)byN[n].sc=s;
+      // استخدم الاسم الأصلي كمفتاح لكن مع توحيد المنطقة
+      var key=normName(n);
+      if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};
+      byN[key].dash.push(r);
+      if(s>byN[key].sc){byN[key].sc=s;byN[key].name=n;}
     }
   });
   D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].tvf.push(r);}});
