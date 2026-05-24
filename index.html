@@ -178,34 +178,26 @@ async function loadAll(){
   D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],file:[],track:[]};
   loaded=false;
   try{
-    // المرحلة 1: dashboard فقط — سريع جداً
-    var d1=await gviz(DASH).catch(function(){return [];});
-    var d2=await gviz(DASH,'ورقة1').catch(function(){return [];});
-    D.dash=d1.concat(d2);
-    loaded=true;
-    setSt('ok','⏳ '+D.dash.length+' dashboard — يكمل التحميل...');
-
-    // المرحلة 2: الباقي في الخلفية بالتوازي
-    Promise.all([
+    var r=await Promise.all([
+      gviz(DASH).catch(function(){return [];}),
+      gviz(DASH,'ورقة1').catch(function(){return [];}),
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
       gviz(TVF).catch(function(){return [];}),
       gviz(TVF,TVF4).catch(function(){return [];}),
       gviz(FILE).catch(function(){return [];}),
       gviz(TRACKING,TRACK_SHEET).catch(function(){return [];})
-    ]).then(function(r){
-      D.stock=r[0];
-      D.sim=r[1];
-      D.tvf=r[2];
-      D.tvf4=r[3];
-      D.file=r[4];
-      D.track=r[5];
-      buildICCID();
-      setSt('ok','✅ جاهز — '+D.dash.length+' dashboard · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim55 · '+D.track.length+' tracking');
-    }).catch(function(e){
-      setSt('ok','✅ جاهز (dashboard) — '+D.dash.length+' سجل');
-    });
-
+    ]);
+    D.dash=r[0].concat(r[1]);
+    D.stock=r[2];
+    D.sim=r[3];
+    D.tvf=r[4];
+    D.tvf4=r[5];
+    D.file=r[6];
+    D.track=r[7];
+    buildICCID();
+    loaded=true;
+    setSt('ok','✅ جاهز — '+D.dash.length+' dashboard · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim55 · '+D.track.length+' tracking');
   }catch(e){setSt('err','فشل: '+e.message);}
 }
 
