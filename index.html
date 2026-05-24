@@ -145,9 +145,11 @@ var TVF='11iL-WTrWcw9hSn5YD6i1LvLnczMrFu0HInjXmBUCFmo';
 var STOCK='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
 var SIM55='1Fwyln1_-ogHjvfnoQnI2tdXTWGRosThZofgjWU2TSl8';
 var FILE='1m6AHs66KJ5RbvQUu5vvM0HGmNalMwElS7LBlk8yVEJA';
+var TRACKING='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
+var TRACK_SHEET='tracking';
 var TVF4='Form Responses 4';
 
-var D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],file:[]};
+var D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],file:[],track:[]};
 var IMAP={};
 var loaded=false;
 var tab='r';
@@ -184,7 +186,8 @@ async function loadAll(){
       gviz(SIM55).catch(function(){return [];}),
       gviz(TVF).catch(function(){return [];}),
       gviz(TVF,TVF4).catch(function(){return [];}),
-      gviz(FILE).catch(function(){return [];})
+      gviz(FILE).catch(function(){return [];}),
+      gviz(TRACKING,TRACK_SHEET).catch(function(){return [];})
     ]);
     D.dash=results[0].concat(results[1]);
     D.stock=results[2];
@@ -192,9 +195,10 @@ async function loadAll(){
     D.tvf=results[4];
     D.tvf4=results[5];
     D.file=results[6];
+    D.track=results[7];
     buildICCID();
     loaded=true;
-    setSt('ok','✅ جاهز — '+D.dash.length+' dashboard · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim55');
+    setSt('ok','✅ جاهز — '+D.dash.length+' dashboard · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim55 · '+D.track.length+' tracking');
   }catch(e){setSt('err','فشل: '+e.message);}
 }
 
@@ -584,6 +588,37 @@ function renderMainCard(br){
     +(toMS(cv(stk,'MSISDN','msid'))&&toMS(cv(stk,'MSISDN','msid')).length>5?'<span class="brm">📶 '+toMS(cv(stk,'MSISDN','msid'))+'</span>':'')
     +(cv(stk,'email')?'<span class="brm">✉️ '+cv(stk,'email')+'</span>':'')
     +'</div></div>';
+  }
+
+  // Tracking
+  var devKey=data&&data.dev?data.dev.toUpperCase():'';
+  if(!devKey&&t)devKey=(cv(t,'رقم جهاز POS')||'').toUpperCase();
+  var trackRows=devKey?D.track.filter(function(r){
+    var v=(cv(r,'vs','B')||'').toUpperCase();
+    return v&&v===devKey;
+  }):[];
+  if(trackRows.length){
+    // Sort by date newest first
+    trackRows.sort(function(a,b){
+      return new Date(cv(b,'date','A')||0)-new Date(cv(a,'date','A')||0);
+    });
+    h+='<div class="sec bl">📦 tracking — '+trackRows.length+' حركة</div>';
+    trackRows.forEach(function(r){
+      var dt=cv(r,'date','A');
+      var ret=cv(r,'return','D');
+      var team=cv(r,'team','E');
+      var rest=cv(r,'rest name','F');
+      var dtype=cv(r,'device type','H');
+      var isOut=ret&&ret.toLowerCase().includes('distribution');
+      h+='<div class="hi"><div class="hr">'
+        +'<span style="font-size:14px">'+(isOut?'📤':'📥')+'</span>'
+        +'<span style="font-size:12px;font-weight:700;color:'+(isOut?'#4ade80':'#fb923c')+'">'+( isOut?'خروج توزيع':'رجوع')+'</span>'
+        +(rest?'<span class="brm">🏪 '+rest+'</span>':'')
+        +(team?'<span class="brm">👤 '+team+'</span>':'')
+        +(dt?'<span class="brm">📅 '+dt+'</span>':'')
+        +(dtype?'<span class="bdg sx">'+dtype+'</span>':'')
+        +'</div></div>';
+    });
   }
 
   // Sim55
