@@ -363,9 +363,23 @@ function bySim(q) {
 // By name
 function byName(q) {
   var byN={};
-  D.dash.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].dash.push(r);if(s>byN[n].sc)byN[n].sc=s;}});
+  // جمع كل التاسكات لكل فرع
+  D.dash.forEach(function(r){
+    var n=cv(r,'اسم المطعم');
+    if(!n)return;
+    var s=score(n,q);
+    if(s>0.3){
+      if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};
+      byN[n].dash.push(r);
+      if(s>byN[n].sc)byN[n].sc=s;
+    }
+  });
   D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].tvf.push(r);}});
   D.sim.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].si.push(r);}});
+  // ترتيب تاسكات كل فرع من الأحدث للأقدم
+  Object.values(byN).forEach(function(br){
+    br.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
+  });
   if (!Object.keys(byN).length) {noRes(q);return;}
   var list=Object.values(byN).sort(function(a,b){
     // ترتيب بالنتيجة أولاً ثم بالتاريخ
