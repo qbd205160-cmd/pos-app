@@ -631,7 +631,7 @@ function pdStr(s){
 }
 
 function doRep(){
-  if(!loaded)return;
+  if(!loaded){setSt('ld','جاري التحميل — سيعرض النتائج تلقائياً...');return;}
   var st=document.getElementById('rSt').value;
   var te=document.getElementById('rTe').value;
   var fr=document.getElementById('rFr').value;
@@ -654,7 +654,7 @@ function doRep(){
 
   var rows=all.filter(function(r){
     if(st&&r.status!==st)return false;
-    if(te&&r.tech!==te)return false;
+    if(te&&r.tech.trim()!==te.trim())return false;
     // مقارنة التاريخ كـ string بعد تحويله
     var ds=pdStr(r.date);
     if(frStr&&ds&&ds<frStr)return false;
