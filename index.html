@@ -176,16 +176,24 @@ async function loadAll(){
   D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],file:[]};
   loaded=false;
   try{
-    D.dash=await gviz(DASH);
-    try{var d2=await gviz(DASH,'ورقة1');D.dash=D.dash.concat(d2);}catch(e){}
-    loaded=true;
-    setSt('ok','⏳ '+D.dash.length+' dashboard — يكمل...');
-    try{D.stock=await gviz(STOCK);}catch(e){}
-    try{D.sim=await gviz(SIM55);}catch(e){}
-    try{D.tvf=await gviz(TVF);}catch(e){}
-    try{D.tvf4=await gviz(TVF,TVF4);}catch(e){}
-    try{D.file=await gviz(FILE);}catch(e){}
+    // كل الشيتات بالتوازي في وقت واحد
+    var results=await Promise.all([
+      gviz(DASH).catch(function(){return [];}),
+      gviz(DASH,'ورقة1').catch(function(){return [];}),
+      gviz(STOCK).catch(function(){return [];}),
+      gviz(SIM55).catch(function(){return [];}),
+      gviz(TVF).catch(function(){return [];}),
+      gviz(TVF,TVF4).catch(function(){return [];}),
+      gviz(FILE).catch(function(){return [];})
+    ]);
+    D.dash=results[0].concat(results[1]);
+    D.stock=results[2];
+    D.sim=results[3];
+    D.tvf=results[4];
+    D.tvf4=results[5];
+    D.file=results[6];
     buildICCID();
+    loaded=true;
     setSt('ok','✅ جاهز — '+D.dash.length+' dashboard · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim55');
   }catch(e){setSt('err','فشل: '+e.message);}
 }
