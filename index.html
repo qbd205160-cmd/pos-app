@@ -195,6 +195,9 @@ async function loadAll() {
       gviz(TRACK, TRACK_S).catch(function(){return [];})
     ]);
     D.stock=rr[0]; D.sim=rr[1]; D.tvf=rr[2]; D.tvf4=rr[3]; D.file=rr[4]; D.track=rr[5];
+    // ترتيب dashboard من الأحدث للأقدم مرة واحدة
+    D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
+    D.tvf.sort(function(a,b){return pd(cv(b,'Timestamp','كرل دايت'))-pd(cv(a,'Timestamp','كرل دايت'));});
     buildICCID();
     setSt('ok', '✅ ' + D.dash.length + ' dash · ' + (D.tvf.length+D.tvf4.length) + ' TVF · ' + D.stock.length + ' stock · ' + D.sim.length + ' sim · ' + D.track.length + ' track');
   } catch(e) { setSt('err', 'فشل: ' + e.message); }
