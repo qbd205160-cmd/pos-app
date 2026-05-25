@@ -508,7 +508,7 @@ function restorePfx(){window._pfxBack=false;if(_br&&_lastQ)byPrefix(_lastQ);}
 
 // ── Build card (device or restaurant) ────────────────────────
 function buildCard(data) {
-  var t   = data.dash&&data.dash.length?data.dash[0]:null;
+  var t   = data.dash&&data.dash.length?latestDash(data):null;
   var tv  = data.tvf&&data.tvf.length?data.tvf[0]:null;
   var si  = data.si5||null;
   var stk = data.stk||null;
