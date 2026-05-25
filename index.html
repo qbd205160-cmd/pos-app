@@ -567,7 +567,7 @@ function buildCard(data){
   if(cc&&cc.length>1)h+=sf('📞','كول سنتر',cc);
   if(maint&&maint.length>1)h+=sf('🔩','صيانة',maint,'fr','re');
   if(lock&&lock.length>1)h+=sf('🔒','قفل الاعدادات',lock);
-  if(apps&&apps!=='—'&&apps.length>1)h+=sf('📱','المنافسين',apps,'fp','pu');
+  if(apps&&apps!=='—'&&apps.length>1)h+=sf('📱','التطبيقات المنافسة',apps,'fp','pu');
   if(blk&&blk!=='#N/A'&&blk.trim())h+=sf('🚫','بلوك السيم',blk,'fr','re');
   if(stk){h+=sf('📦','stock',cv(stk,'status'),cv(stk,'status')==='live'?'fg':'fo',cv(stk,'status')==='live'?'gr':'or');}
   if(id&&id.length>3)h+=sf('🆔','رقم التاسك',id);
@@ -723,13 +723,34 @@ function doRep(){
 
   _repData=rows;
   var s={total:rows.length,n:0,w:0,j:0};
-  rows.forEach(function(r){if(r.status==='نشط')s.n++;else if(r.status==='انتظار')s.w++;else if(r.status==='جديد')s.j++;});
+  var techCount={};
+  rows.forEach(function(r){
+    if(r.status==='نشط')s.n++;else if(r.status==='انتظار')s.w++;else if(r.status==='جديد')s.j++;
+    if(r.tech){techCount[r.tech]=(techCount[r.tech]||0)+1;}
+  });
 
-  document.getElementById('rstats').innerHTML=
-    '<div class="rstat"><div style="font-size:20px">📊</div><div style="font-size:20px;font-weight:900;color:#60a5fa">'+s.total+'</div><div style="font-size:10px;color:#475569">إجمالي</div></div>'+
+  // إحصاءات عامة
+  var statsHtml=
+    '<div class="rstat"><div style="font-size:20px">📊</div><div style="font-size:20px;font-weight:900;color:#60a5fa">'+s.total+'</div><div style="font-size:10px;color:#475569">إجمالي التاسكات</div></div>'+
     '<div class="rstat"><div style="font-size:20px">✅</div><div style="font-size:20px;font-weight:900;color:#4ade80">'+s.n+'</div><div style="font-size:10px;color:#475569">نشط</div></div>'+
     '<div class="rstat"><div style="font-size:20px">⏳</div><div style="font-size:20px;font-weight:900;color:#fbbf24">'+s.w+'</div><div style="font-size:10px;color:#475569">انتظار</div></div>'+
     '<div class="rstat"><div style="font-size:20px">🆕</div><div style="font-size:20px;font-weight:900;color:#93c5fd">'+s.j+'</div><div style="font-size:10px;color:#475569">جديد</div></div>';
+
+  // عدد تاسكات كل فني
+  var techList=Object.keys(techCount).sort(function(a,b){return techCount[b]-techCount[a];});
+  if(techList.length>0){
+    statsHtml+='<div style="grid-column:1/-1;background:#0d1424;border:1px solid #1e3a5f;border-radius:9px;padding:10px;margin-top:4px">';
+    statsHtml+='<div style="font-size:11px;color:#475569;margin-bottom:8px">👤 تاسكات كل فني'+(fr?' | من '+fr:'')+(to?' إلى '+to:'')+'</div>';
+    statsHtml+='<div style="display:flex;flex-wrap:wrap;gap:7px">';
+    techList.forEach(function(tech){
+      statsHtml+='<div style="background:#060a12;border:1px solid #1e293b;border-radius:8px;padding:7px 12px;text-align:center">'
+        +'<div style="font-size:14px;font-weight:900;color:#60a5fa">'+techCount[tech]+'</div>'
+        +'<div style="font-size:10px;color:#475569;margin-top:2px">'+tech+'</div></div>';
+    });
+    statsHtml+='</div></div>';
+  }
+
+  document.getElementById('rstats').innerHTML=statsHtml;
 
   if(!rows.length){document.getElementById('rres').innerHTML='<div class="empty">لا نتائج</div>';return;}
   var h='<div style="font-size:11px;color:#475569;margin-bottom:8px">'+rows.length+' تاسك</div>';
