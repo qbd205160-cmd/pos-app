@@ -472,7 +472,7 @@ function byName(q) {
   var h=renderNameCard(list[0]);
   h+='<div style="font-size:11px;color:#475569;margin:12px 0 6px;padding:6px 10px;background:#0d1424;border-radius:7px;border:1px solid #1e293b">🏪 فروع أخرى ('+(list.length-1)+')</div>';
   list.slice(1).forEach(function(br,i){
-    var t=br.dash[0];
+    var t=latestDash(br);
     h+='<div class="bri" onclick="openBr('+i+')"><div style="flex:1"><div class="brn">'+br.name+'</div>'
       +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:3px">'
       +(t?'<span class="brm">📅 '+cv(t,'submittedAt')+'</span>':'')
