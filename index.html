@@ -647,6 +647,10 @@ function buildCard(data) {
 
 // renderNameCard
 function renderNameCard(br) {
+  // ترتيب من الأحدث للأقدم قبل العرض
+  if(br.dash&&br.dash.length>1){
+    br.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
+  }
   var t=br.dash&&br.dash.length?br.dash[0]:null;
   var tv=br.tvf&&br.tvf.length?br.tvf[0]:null;
   var si=br.si&&br.si.length?br.si[0]:null;
