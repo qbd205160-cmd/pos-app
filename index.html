@@ -195,6 +195,9 @@ async function loadAll() {
       gviz(TRACK, TRACK_S).catch(function(){return [];})
     ]);
     D.stock=rr[0]; D.sim=rr[1]; D.tvf=rr[2]; D.tvf4=rr[3]; D.file=rr[4]; D.track=rr[5];
+    // ترتيب dashboard من الأحدث للأقدم مرة واحدة
+    D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
+    D.tvf.sort(function(a,b){return pd(cv(b,'Timestamp','كرل دايت'))-pd(cv(a,'Timestamp','كرل دايت'));});
     buildICCID();
     setSt('ok', '✅ ' + D.dash.length + ' dash · ' + (D.tvf.length+D.tvf4.length) + ' TVF · ' + D.stock.length + ' stock · ' + D.sim.length + ' sim · ' + D.track.length + ' track');
   } catch(e) { setSt('err', 'فشل: ' + e.message); }
@@ -233,12 +236,13 @@ function pd(s) {
   // gviz Date(year,month,day) - months 0-indexed
   var gm = s.match(/^Date\((\d+),(\d+),(\d+)\)/);
   if (gm) return new Date(parseInt(gm[1]), parseInt(gm[2]), parseInt(gm[3]));
-  // Arabic numerals
+  // Arabic numerals + RTL mark
   var ar={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
-  s=s.replace(/[٠-٩]/g,function(d){return ar[d];}).replace(/‏/g,'').trim();
+  for(var k in ar) s=s.split(k).join(ar[k]);
+  s=s.replace(/\u200f/g,'').trim();
   var m=s.match(/(\d+)\/(\d+)\/(\d+)/);
-  if(!m)return new Date(0);
-  var y=parseInt(m[3]),mo=parseInt(m[2]),d=parseInt(m[1]);
+  if(!m) return new Date(0);
+  var d=parseInt(m[1]),mo=parseInt(m[2]),y=parseInt(m[3]);
   if(y<100){var tmp=y;y=d;d=tmp;}
   var t=s.match(/(\d+):(\d+)/),h=t?parseInt(t[1]):0,mn=t?parseInt(t[2]):0;
   if(s.includes('م')&&h<12)h+=12;
@@ -254,21 +258,35 @@ function fdev(r) {
   });
   return v;
 }
-// مفتاح توحيد الاسم
+// توحيد أسماء الفنيين
+function normTech(t) {
+  if (!t) return '';
+  t = t.trim();
+  var tl = t.toLowerCase();
+  // علي متولي = علي مصطفى (نفس الشخص)
+  if (tl.includes('علي') && (tl.includes('مصطفى') || tl.includes('مصطفي') || tl.includes('متولي') || tl.includes('باريس'))) return 'علي متولي';
+  // محمد غزوان
+  if (tl.includes('محمد') && (tl.includes('غزوان') || tl.includes('زاهد') || tl.includes('العنبر'))) return 'محمد غزوان';
+  // قيصر
+  if (tl.includes('قيصر') || tl === 'qaiser' || tl === 'qaesar') return 'قيصر';
+  // لهيب
+  if (tl.includes('لهيب') || tl === 'laheeb') return 'لهيب';
+  // مصطفى
+  if (tl === 'مصطفى' || tl === 'مصطفي' || tl === 'mustafa') return 'مصطفى';
+  // محمد (بدون لقب)
+  if (tl === 'mohammed' || tl === 'محمد') return 'محمد غزوان';
+  return t;
+}
+
 function normKey(n) {
   if (!n) return '';
-  var s = n
-    .replace(/[\u064B-\u065F\u0670]/g,'')
-    .replace(/[إأآ]/g,'ا')
-    .replace(/ى/g,'ي')
-    .replace(/\s+/g,' ')
-    .trim()
-    .toLowerCase();
+  var s = n.trim().toLowerCase();
   // توحيد الأرقام
-  '٠١٢٣٤٥٦٧٨٩'.split('').forEach(function(c,i){s=s.split(c).join(String(i));});
+  var nums={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+  for(var k in nums) s=s.split(k).join(nums[k]);
   // توحيد chicken
-  s=s.replace(/تشيكن|تشكين|تشكن|شكين|شكن|شيكين|شيكن|جيكن|چكن|تشيكين/g,'جكن');
-  // إصلاح جكنن
+  s=s.replace(/تشيكن|تشكين|تشكن|شكين|شكن|شيكين|شيكن|جيكن|تشيكين/g,'جكن');
+  // إصلاح أخطاء
   s=s.replace(/جكنن/g,'جكن');
   // توحيد المناطق
   s=s.replace(/ش\.?\s*فلسطين|شارع\s*فلسطين/g,'فلسطين');
@@ -281,20 +299,38 @@ function normKey(n) {
   s=s.replace(/الكراده|الكراد|كراده|كرادة|الكرادة/g,'كراده');
   s=s.replace(/الجامعه|الجامعة|جامعه|جامعة/g,'جامعه');
   s=s.replace(/الزعفرانيه|الزعفرانية|زعفرانيه|زعفرانية/g,'زعفرانيه');
-  s=s.replace(/الاعلام|اعلام/g,'اعلام');
   s=s.replace(/البلديات|بلديات/g,'بلديات');
   s=s.replace(/البنوك|بنوك/g,'بنوك');
   s=s.replace(/الغزاليه|الغزالية|غزاليه|غزالية/g,'غزاليه');
-  s=s.replace(/الشعب|شعب/g,'شعب');
   // إزالة ال التعريف
   s=s.replace(/(^| )ال/g,'$1');
   // إزالة / و -
   s=s.replace(/\s*[\/\-]\s*/g,' ').trim();
   // توحيد ة -> ه
   s=s.replace(/ة/g,'ه');
-  return s.trim();
+  // إزالة التشكيل والألف
+  s=s.replace(/[إأآ]/g,'ا').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();
+  return s;
 }
 
+// أحدث تاريخ لفرع من جميع الشيتات
+function latestDate(br) {
+  var best = new Date(0);
+  (br.dash||[]).forEach(function(r){var d=pd(cv(r,'submittedAt'));if(d>best)best=d;});
+  (br.tvf||[]).forEach(function(r){var d=pd(cv(r,'Timestamp','كرل دايت'));if(d>best)best=d;});
+  return best;
+}
+
+// أحدث سجل dashboard لفرع
+function latestDash(br) {
+  if(!br.dash||!br.dash.length) return null;
+  var best=br.dash[0], bestD=pd(cv(br.dash[0],'submittedAt'));
+  for(var i=1;i<br.dash.length;i++){
+    var d=pd(cv(br.dash[i],'submittedAt'));
+    if(d>bestD){bestD=d;best=br.dash[i];}
+  }
+  return best;
+}
 
 function score(name,q) {
   name=(name||'').toLowerCase().trim(); q=(q||'').toLowerCase().trim();
@@ -330,7 +366,10 @@ function setTab(t) {
 function go() {
   var q = (document.getElementById('si').value||'').trim();
   if (!q) return;
-  if (!loaded) { alert('انتظر حتى يكتمل التحميل'); return; }
+  if (!loaded) { 
+    setSt('ld','جاري التحميل — سيبحث تلقائياً عند الانتهاء...');
+    return; 
+  }
   showLd(true);
   setTimeout(function(){
     var ql=q.toLowerCase();
@@ -410,126 +449,38 @@ function bySim(q) {
   renderDev({name:name||q, dev:dev, sim:q, dash:dash, tvf:tvf, stk:null, trk:trk, si5:si5[0]||null});
 }
 
-// By name - يبحث بالاسم الأول والمنطقة في كل الشيتات
+// By name
 function byName(q) {
-  var byN = {};
-  var ql = q.toLowerCase().trim();
-
-  // دالة للبحث في اسم المطعم - يطابق الاسم الأول والمنطقة
-  function matchName(n) {
-    if (!n) return 0;
-    return score(n, q);
-  }
-
-  // جمع من dashboard
-  D.dash.forEach(function(r) {
-    var n = cv(r,'اسم المطعم');
-    if (!n) return;
-    var s = matchName(n);
-    if (s <= 0.3) return;
-    var key = normKey(n);
-    if (!byN[key]) byN[key] = {name:n, sc:s, dash:[], tvf:[], stk:[], si:[]};
-    byN[key].dash.push(r);
-    if (s > byN[key].sc) { byN[key].sc=s; byN[key].name=n; }
+  var byN={};
+  D.dash.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].dash.push(r);if(s>byN[key].sc){byN[key].sc=s;byN[key].name=n;}}});
+  D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].tvf.push(r);}});
+  D.sim.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].si.push(r);}});
+  if (!Object.keys(byN).length) {noRes(q);return;}
+  var list=Object.values(byN).sort(function(a,b){return b.sc-a.sc;});
+  var best=list[0].sc;
+  list=list.filter(function(x){return x.sc>=best*0.75;});
+  list.forEach(function(br){
+    br.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
+    var devs={},sims={};
+    br.dash.forEach(function(r){var d=nd(cv(r,'رقم جهاز POS'));if(d.length>4)devs[d]=true;var s=ns(cv(r,'رقم SIM كارت POS'));if(s.length>6)sims[s]=true;});
+    br.tvf=br.tvf.concat(D.tvf.filter(function(r){var d=nd(fdev(r)||cv(r,'رقم الجهاز'));return devs[d];})).sort(function(a,b){return pd(cv(b,'Timestamp'))-pd(cv(a,'Timestamp'));});
+    D.stock.forEach(function(r){var d=nd(fdev(r)||cv(r,'vs'));if(devs[d])br.stk.push(r);});
+    D.sim.forEach(function(r){var s=ns(cv(r,'ارقام'));if(sims[s])br.si.push(r);});
   });
-
-  // جمع من TVF4
-  D.tvf4.forEach(function(r) {
-    var n = cv(r,'اسم المطعم');
-    if (!n) return;
-    var s = matchName(n);
-    if (s <= 0.3) return;
-    var key = normKey(n);
-    if (!byN[key]) byN[key] = {name:n, sc:s, dash:[], tvf:[], stk:[], si:[]};
-    byN[key].tvf.push(r);
-  });
-
-  // جمع من sim55
-  D.sim.forEach(function(r) {
-    var n = cv(r,'اسم المطعم');
-    if (!n) return;
-    var s = matchName(n);
-    if (s <= 0.3) return;
-    var key = normKey(n);
-    if (!byN[key]) byN[key] = {name:n, sc:s, dash:[], tvf:[], stk:[], si:[]};
-    byN[key].si.push(r);
-  });
-
-  if (!Object.keys(byN).length) { noRes(q); return; }
-
-  // ترتيب التاسكات من الأحدث للأقدم داخل كل فرع
-  Object.values(byN).forEach(function(br) {
-    br.dash.sort(function(a,b) {
-      return pd(cv(b,'submittedAt')) - pd(cv(a,'submittedAt'));
-    });
-    br.tvf.sort(function(a,b) {
-      return pd(cv(b,'Timestamp','كرل دايت')) - pd(cv(a,'Timestamp','كرل دايت'));
-    });
-  });
-
-  // ترتيب الفروع: الأعلى تطابقاً أولاً ثم الأحدث
-  var list = Object.values(byN).sort(function(a,b) {
-    if (Math.abs(b.sc-a.sc) > 0.05) return b.sc - a.sc;
-    var ta = a.dash.length ? pd(cv(a.dash[0],'submittedAt')) : new Date(0);
-    var tb = b.dash.length ? pd(cv(b.dash[0],'submittedAt')) : new Date(0);
-    return tb - ta;
-  });
-
-  var best = list[0].sc;
-  list = list.filter(function(x) { return x.sc >= best*0.75; });
-
-  // إضافة TVF5 وstock وsim عبر رقم الجهاز
-  list.forEach(function(br) {
-    var devs={}, sims={};
-    br.dash.forEach(function(r) {
-      var d=nd(cv(r,'رقم جهاز POS'));
-      if(d.length>4)devs[d]=true;
-      var s=ns(cv(r,'رقم SIM كارت POS'));
-      if(s.length>6)sims[s]=true;
-    });
-    br.tvf4.forEach(function(r) {
-      var d=nd(cv(r,'POS number')||fdev(r));
-      if(d.length>4)devs[d]=true;
-    });
-    // إضافة TVF5
-    br.tvf = br.tvf.concat(D.tvf.filter(function(r) {
-      var d=nd(fdev(r)||cv(r,'رقم الجهاز'));
-      return devs[d];
-    })).sort(function(a,b){return pd(cv(b,'Timestamp'))-pd(cv(a,'Timestamp'));});
-    // إضافة stock
-    D.stock.forEach(function(r) {
-      var d=nd(fdev(r)||cv(r,'vs'));
-      if(devs[d]) br.stk.push(r);
-    });
-    // إضافة sim55 إضافي
-    D.sim.forEach(function(r) {
-      var s=ns(cv(r,'ارقام'));
-      if(sims[s]&&!br.si.find(function(x){return x===r;})) br.si.push(r);
-    });
-  });
-
   _br=list; _lastQ=q;
-
   if (list.length===1) { renderName(list[0]); return; }
-
-  var h = renderNameCard(list[0]);
-  h += '<div style="font-size:11px;color:#475569;margin:12px 0 6px;padding:6px 10px;background:#0d1424;border-radius:7px;border:1px solid #1e293b">🏪 فروع أخرى ('+(list.length-1)+')</div>';
-  list.slice(1).forEach(function(br,i) {
-    var t = br.dash && br.dash.length ? br.dash[0] : null;
-    var st = t ? cv(t,'status') : '';
-    var date = t ? cv(t,'submittedAt') : '';
-    var dev = t ? cv(t,'رقم جهاز POS') : '';
-    h += '<div class="bri" onclick="openBr('+i+')">'
-      + '<div style="flex:1"><div class="brn">'+br.name+'</div>'
-      + '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:3px">'
-      + (date?'<span class="brm">📅 '+date+'</span>':'')
-      + (dev&&['1','2','3'].indexOf(dev)<0?'<span class="brm">🖥️ '+dev+'</span>':'')
-      + (st?'<span class="bdg '+bdg(st)+'">'+st+'</span>':'')
-      + '</div></div>'
-      + '<span style="color:#3b82f6">◀</span></div>';
+  var h=renderNameCard(list[0]);
+  h+='<div style="font-size:11px;color:#475569;margin:12px 0 6px;padding:6px 10px;background:#0d1424;border-radius:7px;border:1px solid #1e293b">🏪 فروع أخرى ('+(list.length-1)+')</div>';
+  list.slice(1).forEach(function(br,i){
+    var t=latestDash(br);
+    h+='<div class="bri" onclick="openBr('+i+')"><div style="flex:1"><div class="brn">'+br.name+'</div>'
+      +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:3px">'
+      +(t?'<span class="brm">📅 '+cv(t,'submittedAt')+'</span>':'')
+      +(t?'<span class="bdg '+bdg(cv(t,'status'))+'">'+cv(t,'status')+'</span>':'')
+      +'</div></div><span style="color:#3b82f6">◀</span></div>';
   });
-  h += '<button class="ebtn" onclick="expName()">📥 تصدير CSV</button>';
-  document.getElementById('res').innerHTML = h;
+  h+='<button class="ebtn" onclick="expName()">📥 تصدير CSV</button>';
+  document.getElementById('res').innerHTML=h;
 }
 
 function openBr(i) {
@@ -590,7 +541,13 @@ function buildCard(data) {
   if(stat)h+=sf('📊','الحالة',stat,stat==='نشط'||stat==='Active'?'fg':'','gr');
   if(simst)h+=sf('📡','حالة السيم',simst,simst==='4G'?'fg':simst==='غير فعال'?'fr':'');
   if(posT&&posT.length>1&&posT!=='عدم توفر')h+=sf('🖨️','نوع الجهاز',posT);
-  if(date)h+=sf('📅','آخر تاسك',date,'fb','bl');
+  if(date){
+    // تحويل Date(y,m,d) لنص مقروء
+    var dispDate=date;
+    var gdm=date.match(/^Date\((\d+),(\d+),(\d+)\)/);
+    if(gdm){var gmo=parseInt(gdm[2])+1;dispDate=parseInt(gdm[3])+'/'+(gmo)+'/' +gdm[1];}
+    h+=sf('📅','آخر تاسك',dispDate,'fb','bl');
+  }
   if(tech)h+=sf('👤','آخر فني',tech);
   if(reason&&reason.length>1)h+=sf('🔧','سبب الزيارة',reason);
   if(cc&&cc.length>1)h+=sf('📞','كول سنتر',cc);
@@ -709,7 +666,7 @@ function buildCard(data) {
 
 // renderNameCard
 function renderNameCard(br) {
-  var t=br.dash&&br.dash.length?br.dash[0]:null;
+  var t=latestDash(br);
   var tv=br.tvf&&br.tvf.length?br.tvf[0]:null;
   var si=br.si&&br.si.length?br.si[0]:null;
   var stk=br.stk&&br.stk.length?br.stk[0]:null;
@@ -721,54 +678,91 @@ function renderNameCard(br) {
 // ── Reports ───────────────────────────────────────────────────
 function buildRepFilters(){
   var techs=new Set();
-  D.dash.forEach(function(r){var t=cv(r,'اسم الموظف المسؤول');if(t&&t.length>1)techs.add(t);});
+  D.dash.forEach(function(r){var t=normTech(cv(r,'اسم الموظف المسؤول'));if(t&&t.length>1)techs.add(t);});
+  D.tvf.concat(D.tvf4).forEach(function(r){var t=normTech(cv(r,'اسم الوظف','اسم الموظف المسؤول'));if(t&&t.length>1)techs.add(t);});
   var sel=document.getElementById('rTe'); var cur=sel.value;
   sel.innerHTML='<option value="">الكل</option>';
   Array.from(techs).sort().forEach(function(t){sel.innerHTML+='<option>'+t+'</option>';});
   sel.value=cur;
 }
 
+// تحويل التاريخ لصيغة YYYY-MM-DD للمقارنة
+function pdStr(s){
+  if(!s)return '';
+  s=String(s).trim();
+  var gm=s.match(/^Date\((\d+),(\d+),(\d+)\)/);
+  if(gm){var mo=parseInt(gm[2])+1;return gm[1]+'-'+(mo<10?'0':'')+mo+'-'+(parseInt(gm[3])<10?'0':'')+gm[3];}
+  var ar={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+  for(var k in ar)s=s.split(k).join(ar[k]);
+  s=s.replace(/‏/g,'').trim();
+  var m=s.match(/(\d+)\/(\d+)\/(\d+)/);
+  if(!m)return '';
+  var d=parseInt(m[1]),mo=parseInt(m[2]),y=parseInt(m[3]);
+  if(y<100){var tmp=y;y=d;d=tmp;}
+  return y+'-'+(mo<10?'0':'')+mo+'-'+(d<10?'0':'')+d;
+}
+
 function doRep(){
-  if(!loaded)return;
+  if(!loaded){setSt('ld','جاري التحميل — سيعرض النتائج تلقائياً...');return;}
   var st=document.getElementById('rSt').value;
   var te=document.getElementById('rTe').value;
   var fr=document.getElementById('rFr').value;
   var to=document.getElementById('rTo').value;
   var srch=(document.getElementById('rSrch').value||'').toLowerCase();
-  var byN={};
-  D.dash.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;if(!byN[n]||pd(cv(r,'submittedAt'))>pd(cv(byN[n],'submittedAt')))byN[n]=r;});
-  var rows=Object.values(byN).filter(function(r){
-    if(st&&cv(r,'status')!==st)return false;
-    if(te&&cv(r,'اسم الموظف المسؤول')!==te)return false;
-    if(fr&&pd(cv(r,'submittedAt'))<new Date(fr))return false;
-    if(to&&pd(cv(r,'submittedAt'))>new Date(to+'T23:59:59'))return false;
-    if(srch&&!Object.values(r).join(' ').toLowerCase().includes(srch))return false;
+  // تحويل فلاتر التاريخ لصيغة مقارنة بسيطة
+  var frStr=fr||'';   // 'YYYY-MM-DD'
+  var toStr=to||'';
+
+  // كل التاسكات من dashboard + TVF
+  var all=[];
+  D.dash.forEach(function(r){
+    var n=cv(r,'اسم المطعم'); if(!n)return;
+    all.push({name:n,date:cv(r,'submittedAt'),tech:normTech(cv(r,'اسم الموظف المسؤول')),status:cv(r,'status'),dev:cv(r,'رقم جهاز POS'),sim:toMS(cv(r,'رقم SIM كارت POS')),addr:cv(r,'العنوان'),reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظات'),apps:cv(r,'منافس'),simst:cv(r,'حالة SIM'),src:'dash'});
+  });
+  D.tvf.concat(D.tvf4).forEach(function(r){
+    var n=cv(r,'اسم المطعم','اسم الوظف'); if(!n)return;
+    all.push({name:n,date:cv(r,'Timestamp','كرل دايت'),tech:normTech(cv(r,'اسم الوظف','اسم الموظف المسؤول')),status:'',dev:fdev(r)||cv(r,'POS number','رقم الجهاز'),sim:toMS(cv(r,'رقم السم كارت','SIM number')),addr:'',reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظة','ملاحظات'),apps:'',simst:'',src:'TVF'});
+  });
+
+  var rows=all.filter(function(r){
+    if(st&&r.status!==st)return false;
+    if(te&&r.tech.trim()!==te.trim())return false;
+    // مقارنة التاريخ كـ string بعد تحويله
+    var ds=pdStr(r.date);
+    if(frStr&&ds&&ds<frStr)return false;
+    if(toStr&&ds&&ds>toStr)return false;
+    if(srch&&!(r.name+' '+r.tech+' '+r.dev+' '+r.note+' '+r.reason).toLowerCase().includes(srch))return false;
     return true;
-  }).sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
+  }).sort(function(a,b){return pd(b.date)-pd(a.date);});
+
   _repData=rows;
-  var s={total:rows.length,n:0,w:0,j:0,d:0};
-  rows.forEach(function(r){var v=cv(r,'status');if(v==='نشط')s.n++;else if(v==='انتظار')s.w++;else if(v==='جديد')s.j++;else if(v==='مكتمل')s.d++;});
+  var s={total:rows.length,n:0,w:0,j:0};
+  rows.forEach(function(r){if(r.status==='نشط')s.n++;else if(r.status==='انتظار')s.w++;else if(r.status==='جديد')s.j++;});
+
   document.getElementById('rstats').innerHTML=
     '<div class="rstat"><div style="font-size:20px">📊</div><div style="font-size:20px;font-weight:900;color:#60a5fa">'+s.total+'</div><div style="font-size:10px;color:#475569">إجمالي</div></div>'+
     '<div class="rstat"><div style="font-size:20px">✅</div><div style="font-size:20px;font-weight:900;color:#4ade80">'+s.n+'</div><div style="font-size:10px;color:#475569">نشط</div></div>'+
     '<div class="rstat"><div style="font-size:20px">⏳</div><div style="font-size:20px;font-weight:900;color:#fbbf24">'+s.w+'</div><div style="font-size:10px;color:#475569">انتظار</div></div>'+
     '<div class="rstat"><div style="font-size:20px">🆕</div><div style="font-size:20px;font-weight:900;color:#93c5fd">'+s.j+'</div><div style="font-size:10px;color:#475569">جديد</div></div>';
+
   if(!rows.length){document.getElementById('rres').innerHTML='<div class="empty">لا نتائج</div>';return;}
-  var h='<div style="font-size:11px;color:#475569;margin-bottom:8px">'+rows.length+' مطعم</div>';
+  var h='<div style="font-size:11px;color:#475569;margin-bottom:8px">'+rows.length+' تاسك</div>';
   rows.forEach(function(r,i){
-    var st2=cv(r,'status'); var dev=cv(r,'رقم جهاز POS'); var sim=toMS(cv(r,'رقم SIM كارت POS'));
-    h+='<div class="hi" style="cursor:pointer;margin-bottom:6px" onclick="this.querySelector(\'.rd\').style.display=this.querySelector(\'.rd\').style.display===\'none\'?\'block\':\'none\'">'
-      +'<div class="hr"><span style="font-size:11px;color:#334155;min-width:22px">'+(i+1)+'</span><span style="font-size:13px;font-weight:700;color:#e2e8f0;flex:1">'+cv(r,'اسم المطعم')+'</span>'+(dev&&['1','2','3'].indexOf(dev)<0?'<span style="font-size:10px;color:#60a5fa">🖥️ '+dev+'</span>':'')+'<span class="bdg '+bdg(st2)+'">'+st2+'</span></div>'
-      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:3px">'
-      +(cv(r,'العنوان')?'<span class="brm">📍 '+cv(r,'العنوان')+'</span>':'')
-      +(cv(r,'submittedAt')?'<span class="brm">📅 '+cv(r,'submittedAt')+'</span>':'')
-      +(cv(r,'اسم الموظف المسؤول')?'<span class="brm">👤 '+cv(r,'اسم الموظف المسؤول')+'</span>':'')
+    h+='<div class="hi" style="cursor:pointer;margin-bottom:6px'+(r.src==='TVF'?';border-color:rgba(139,92,246,.2)':'')+'" onclick="var d=this.querySelector(\'.rd\');d.style.display=d.style.display===\'none\'?\'block\':\'none\'">'
+      +'<div class="hr"><span style="font-size:11px;color:#334155;min-width:22px">'+(i+1)+'</span>'
+      +'<span style="font-size:13px;font-weight:700;color:#e2e8f0;flex:1">'+r.name+'</span>'
+      +(r.dev&&['1','2','3','VB','VE','VS','78','//'].indexOf(r.dev)<0?'<span style="font-size:10px;color:#60a5fa">🖥️ '+r.dev+'</span>':'')
+      +(r.status?'<span class="bdg '+bdg(r.status)+'">'+r.status+'</span>':'<span style="font-size:9px;color:#c4b5fd">'+r.src+'</span>')
       +'</div>'
-      +'<div class="rd" style="display:none;margin-top:8px;padding-top:7px;border-top:1px solid #1e293b;font-size:11px;display:grid;grid-template-columns:1fr 1fr;gap:5px">'
-      +(sim&&sim.length>5?'<div><span style="color:#475569">📶 </span><span style="color:#fb923c">'+sim+'</span></div>':'')
-      +(cv(r,'حالة SIM')?'<div><span style="color:#475569">📡 </span><span style="color:'+(cv(r,'حالة SIM')==='4G'?'#4ade80':'#f87171')+'">'+cv(r,'حالة SIM')+'</span></div>':'')
-      +(cv(r,'منافس')&&cv(r,'منافس')!=='—'?'<div style="grid-column:1/-1"><span style="color:#475569">📱 </span><span style="color:#c4b5fd">'+cv(r,'منافس')+'</span></div>':'')
-      +(cv(r,'ملاحظات')&&cv(r,'ملاحظات')!=='—'?'<div style="grid-column:1/-1"><span style="color:#475569">📝 </span><span style="color:#94a3b8">'+cv(r,'ملاحظات')+'</span></div>':'')
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:3px">'
+      +(r.date?'<span class="brm">📅 '+r.date+'</span>':'')+(r.tech?'<span class="brm">👤 '+r.tech+'</span>':'')+(r.addr?'<span class="brm">📍 '+r.addr+'</span>':'')
+      +'</div>'
+      +'<div class="rd" style="display:none;margin-top:8px;padding-top:7px;border-top:1px solid #1e293b;display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px">'
+      +(r.sim&&r.sim.length>5?'<div><span style="color:#475569">📶 </span><span style="color:#fb923c">'+r.sim+'</span></div>':'')
+      +(r.simst?'<div><span style="color:#475569">📡 </span><span style="color:'+(r.simst==='4G'?'#4ade80':'#f87171')+'">'+r.simst+'</span></div>':'')
+      +(r.reason?'<div style="grid-column:1/-1"><span style="color:#475569">🔧 </span><span style="color:#7dd3fc">'+r.reason+'</span></div>':'')
+      +(r.apps&&r.apps!=='—'?'<div style="grid-column:1/-1"><span style="color:#475569">📱 </span><span style="color:#c4b5fd">'+r.apps+'</span></div>':'')
+      +(r.note&&r.note!=='—'?'<div style="grid-column:1/-1"><span style="color:#475569">📝 </span><span style="color:#94a3b8">'+r.note+'</span></div>':'')
       +'</div></div>';
   });
   document.getElementById('rres').innerHTML=h;
