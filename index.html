@@ -75,7 +75,7 @@ body{background:#07090f;color:#e2e8f0;font-family:'Tajawal',sans-serif;direction
 <body>
 <div class="hdr">
   <div class="logo">🖨</div>
-  <div><div class="htitle">نظام تتبع POS</div><div class="hsub" id="hsub">dashboard · TVF · stock · sim55</div></div>
+  <div><div class="htitle">نظام تتبع POS</div><div class="hsub" id="hsub">dashboard · TVF(FR1+FR2+FR4+S6+S7+S8) · stock · sim55</div></div>
   <div class="tabs">
     <button class="tb on" id="t_r" onclick="setTab('r')">🏪 مطعم</button>
     <button class="tb" id="t_d" onclick="setTab('d')">🖥️ جهاز</button>
@@ -133,13 +133,20 @@ body{background:#07090f;color:#e2e8f0;font-family:'Tajawal',sans-serif;direction
 <script>
 var DASH='1TnlxGwD0G6FV654bFCbXmjL4Ek59IGJWkAYYlb_GD7w';
 var TVF='11iL-WTrWcw9hSn5YD6i1LvLnczMrFu0HInjXmBUCFmo';
-var TVF4='Form Responses 4';
+// TVF sheets
+var TVF_FR1='Form Responses 1';
+var TVF_FR2='Form Responses 2';
+var TVF_FR4='Form Responses 4';
+var TVF_S5='Form Responses 5';
+var TVF_S6='Sheet6';
+var TVF_S7='Sheet7';
+var TVF_S8='Sheet8';
 var STOCK='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
 var SIM55='1Fwyln1_-ogHjvfnoQnI2tdXTWGRosThZofgjWU2TSl8';
 var TRACK='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
 var TRACK_S='tracking';
 
-var D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],track:[]};
+var D={dash:[],tvf:[],tvfR:[],stock:[],sim:[],track:[]};
 var loaded=false;
 var _branches=[];
 var _lastQ='';
@@ -167,25 +174,30 @@ async function loadAll(){
   D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],track:[]};
   loaded=false;
   try{
+    // تحميل كل الشيتات بالتوازي
     var r=await Promise.all([
       gviz(DASH).catch(function(){return [];}),
       gviz(DASH,'ورقة1').catch(function(){return [];}),
       gviz(TVF).catch(function(){return [];}),
-      gviz(TVF,TVF4).catch(function(){return [];}),
+      gviz(TVF,TVF_FR2).catch(function(){return [];}),
+      gviz(TVF,TVF_FR4).catch(function(){return [];}),
+      gviz(TVF,TVF_S6).catch(function(){return [];}),
+      gviz(TVF,TVF_S7).catch(function(){return [];}),
+      gviz(TVF,TVF_S8).catch(function(){return [];}),
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
       gviz(TRACK,TRACK_S).catch(function(){return [];})
     ]);
-    // دمج dashboard من الشيتين وترتيب من الأحدث
     D.dash=r[0].concat(r[1]);
     D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
-    D.tvf=r[2];
-    D.tvf4=r[3];
-    D.stock=r[4];
-    D.sim=r[5];
-    D.track=r[6];
+    D.tvf=r[2]; // FR1: رقم الجهاز + السيم
+    D.tvfR=r[3].concat(r[4]).concat(r[5]).concat(r[6]).concat(r[7]); // FR2+FR4+S6+S7+S8: اسم المطعم
+    D.tvfR.sort(function(a,b){return pd(cv(b,'كرل دايت','التاريخ','Timestamp'))-pd(cv(a,'كرل دايت','التاريخ','Timestamp'));});
+    D.stock=r[8];
+    D.sim=r[9];
+    D.track=r[10];
     loaded=true;
-    setSt('ok','✅ '+D.dash.length+' dash · '+(D.tvf.length+D.tvf4.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim');
+    setSt('ok','✅ '+D.dash.length+' dash · '+(D.tvf.length+D.tvfR.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim');
     buildRepFilters();
   }catch(e){setSt('err','فشل: '+e.message);}
 }
@@ -434,6 +446,15 @@ function byName(q){
     byN[key].dash.push(r);
     if(s>byN[key].sc){byN[key].sc=s;byN[key].name=n;}
   });
+  // TVF شيتات اسم المطعم (FR2+FR4+S6+S7+S8)
+  D.tvfR.forEach(function(r){
+    var n=cv(r,'اسم المطعم');if(!n)return;
+    var s=score(n,q);if(s<=0.3)return;
+    var key=normKey(n);
+    if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],tvf4:[],stock:[],sim55:[],track:[]};
+    byN[key].tvf4.push(r);
+    if(s>byN[key].sc){byN[key].sc=s;byN[key].name=n;}
+  });
   D.tvf4.forEach(function(r){
     var n=cv(r,'اسم المطعم');if(!n)return;
     var s=score(n,q);if(s<=0.3)return;
@@ -665,7 +686,7 @@ function buildCard(data){
 function buildRepFilters(){
   var techs=new Set();
   D.dash.forEach(function(r){var t=normTech(cv(r,'اسم الموظف المسؤول'));if(t&&t.length>1)techs.add(t);});
-  D.tvf.concat(D.tvf4).forEach(function(r){var t=normTech(cv(r,'اسم الوظف','اسم الموظف'));if(t&&t.length>1)techs.add(t);});
+  D.tvf.concat(D.tvfR).forEach(function(r){var t=normTech(cv(r,'اسم الوظف','اسم الموظف'));if(t&&t.length>1)techs.add(t);});
   var sel=document.getElementById('rTe');var cur=sel.value;
   sel.innerHTML='<option value="">الكل</option>';
   Array.from(techs).sort().forEach(function(t){sel.innerHTML+='<option>'+t+'</option>';});
@@ -685,7 +706,7 @@ function doRep(){
     var n=cv(r,'اسم المطعم');if(!n)return;
     all.push({name:n,date:cv(r,'submittedAt'),tech:normTech(cv(r,'اسم الموظف المسؤول')),status:cv(r,'status'),dev:cv(r,'رقم جهاز POS'),sim:cv(r,'رقم SIM كارت POS'),addr:cv(r,'العنوان'),reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظات'),src:'dash'});
   });
-  D.tvf.concat(D.tvf4).forEach(function(r){
+  D.tvf.concat(D.tvfR).forEach(function(r){
     var n=cv(r,'اسم المطعم','اسم الوظف');if(!n)return;
     all.push({name:n,date:cv(r,'الطابع الزمني','Timestamp'),tech:normTech(cv(r,'اسم الوظف','اسم الموظف')),status:'',dev:fdev(r)||cv(r,'رقم الجهاز'),sim:cv(r,'رقم السم كارت'),addr:'',reason:cv(r,'سبب الزيارة'),note:cv(r,'ملاحظة'),src:'TVF'});
   });
