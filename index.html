@@ -321,12 +321,25 @@ function setTab(t){
 
 // ── latestDash: أحدث سجل في dashboard لفرع ────────────────────
 function latestDash(br){
-  if(!br.dash||!br.dash.length)return null;
+  if(!br||!br.dash||!br.dash.length)return null;
   var best=br.dash[0],bestD=pd(cv(br.dash[0],'submittedAt'));
   for(var i=1;i<br.dash.length;i++){
     var d=pd(cv(br.dash[i],'submittedAt'));
     if(d>bestD){bestD=d;best=br.dash[i];}
   }
+  return best;
+}
+
+// ── latestAny: أحدث تاريخ من جميع الشيتات لفرع ───────────────
+function latestAny(br){
+  if(!br)return new Date(0);
+  var best=new Date(0);
+  // dashboard
+  (br.dash||[]).forEach(function(r){var d=pd(cv(r,'submittedAt'));if(d>best)best=d;});
+  // tvfR (FR2+FR4+S6+S7+S8) - له اسم المطعم
+  (br.tvf4||[]).forEach(function(r){var d=pd(cv(r,'كرل دايت','التاريخ','الطابع الزمني','Timestamp'));if(d>best)best=d;});
+  // tvf (FR1) - رقم الجهاز فقط
+  (br.tvf||[]).forEach(function(r){var d=pd(cv(r,'Timestamp'));if(d>best)best=d;});
   return best;
 }
 
@@ -477,9 +490,7 @@ function byName(q){
   });
   var list=Object.values(byN).sort(function(a,b){
     if(Math.abs(b.sc-a.sc)>0.05)return b.sc-a.sc;
-    var ta=latestDash(a)||new Date(0);
-    var tb=latestDash(b)||new Date(0);
-    return (tb instanceof Date?tb:new Date(0))-(ta instanceof Date?ta:new Date(0));
+    return latestAny(b)-latestAny(a);
   });
   var best=list[0].sc;
   list=list.filter(function(x){return x.sc>=best*0.75;});
@@ -502,9 +513,20 @@ function byName(q){
   h+='<div style="font-size:11px;color:#475569;margin:12px 0 6px;padding:6px 10px;background:#0d1424;border-radius:7px;border:1px solid #1e293b">🏪 فروع أخرى ('+(list.length-1)+')</div>';
   list.slice(1).forEach(function(br,i){
     var t=latestDash(br);
+    // أحدث تاريخ من كل الشيتات
+    var anyDate=latestAny(br);
+    var anyDateStr=anyDate>new Date(0)?fmtDate(anyDate.toLocaleDateString('en-GB')):'';
+    // إذا tvfR أحدث من dashboard اعرض تاريخه
+    var tvfLatest=null;
+    if(br.tvf4&&br.tvf4.length){
+      tvfLatest=br.tvf4.reduce(function(a,b){return pd(cv(b,'كرل دايت','التاريخ','الطابع الزمني','Timestamp'))>pd(cv(a,'كرل دايت','التاريخ','الطابع الزمني','Timestamp'))?b:a;});
+    }
+    var dashDate=t?pd(cv(t,'submittedAt')):new Date(0);
+    var tvfDate=tvfLatest?pd(cv(tvfLatest,'كرل دايت','التاريخ','الطابع الزمني','Timestamp')):new Date(0);
+    var showDate=tvfDate>dashDate?fmtDate(cv(tvfLatest,'كرل دايت','التاريخ','الطابع الزمني','Timestamp')):t?fmtDate(cv(t,'submittedAt')):'';
     h+='<div class="bri" onclick="openBr('+i+')"><div style="flex:1"><div class="brn">'+br.name+'</div>'
       +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:3px">'
-      +(t?'<span class="brm">📅 '+fmtDate(cv(t,'submittedAt'))+'</span>':'')
+      +(showDate?'<span class="brm">📅 '+showDate+'</span>':'')
       +(t&&cv(t,'رقم جهاز POS')&&['1','2','3'].indexOf(cv(t,'رقم جهاز POS'))<0?'<span class="brm">🖥️ '+cv(t,'رقم جهاز POS')+'</span>':'')
       +(t?'<span class="bdg '+bdg(cv(t,'status'))+'">'+cv(t,'status')+'</span>':'')
       +'</div></div><span style="color:#3b82f6">◀</span></div>';
