@@ -459,7 +459,7 @@ function bySim(q) {
 function byName(q) {
   var byN={};
   D.dash.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].dash.push(r);if(s>byN[key].sc){byN[key].sc=s;byN[key].name=n;}}});
-  D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم','اسم الوظف');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].tvf.push(r);}});
+  D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].tvf.push(r);}});
   D.sim.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].si.push(r);}});
   if (!Object.keys(byN).length) {noRes(q);return;}
   var list=Object.values(byN).sort(function(a,b){return b.sc-a.sc;});
@@ -597,31 +597,6 @@ function buildCard(data) {
           +(cv(ht,'ملاحظات')&&cv(ht,'ملاحظات')!=='—'?'<div style="font-size:10px;color:#94a3b8;margin-top:2px">📝 '+cv(ht,'ملاحظات')+'</div>':'')
           +'</div>';
       }
-      h+='</div>';
-    }
-  }
-
-  // TVF4 (Form Responses 4: الطابع الزمني|اسم الموظف||اسم المطعم|نوع الجهاز)
-  if(data.tvf4&&data.tvf4.length){
-    h+='<div class="sec secp">📋 TVF4 — '+data.tvf4.length+' سجل</div>';
-    var tv4=data.tvf4.sort(function(a,b){return pd(cv(b,'الطابع الزمني','Timestamp'))-pd(cv(a,'الطابع الزمني','Timestamp'));})[0];
-    var tv4date=cv(tv4,'الطابع الزمني','Timestamp');
-    var tv4tech=cv(tv4,'اسم الموظف','اسم الوظف');
-    var tv4rest=cv(tv4,'اسم المطعم');
-    h+='<div class="hi"><div class="hr"><span style="font-size:12px;font-weight:700;color:#e2e8f0;flex:1">'+tv4rest+'</span></div>'
-      +'<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:3px">'
-      +(tv4date?'<span class="brm">📅 '+tv4date+'</span>':'')
-      +(tv4tech?'<span class="brm">👤 '+tv4tech+'</span>':'')
-      +'</div></div>';
-    if(data.tvf4.length>1){
-      var tid4='f4'+Math.random().toString(36).slice(2,7);
-      h+='<button class="hbtn" onclick="tgl(this,''+tid4+'')">▼ باقي سجلات TVF4 ('+(data.tvf4.length-1)+')</button><div id="'+tid4+'" style="display:none">';
-      data.tvf4.slice(1).forEach(function(r4){
-        h+='<div class="hi"><div class="hr">'
-          +(cv(r4,'الطابع الزمني','Timestamp')?'<span class="brm">📅 '+cv(r4,'الطابع الزمني','Timestamp')+'</span>':'')
-          +(cv(r4,'اسم الموظف','اسم الوظف')?'<span class="brm">👤 '+cv(r4,'اسم الموظف','اسم الوظف')+'</span>':'')
-          +'</div></div>';
-      });
       h+='</div>';
     }
   }
