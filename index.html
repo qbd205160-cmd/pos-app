@@ -210,15 +210,28 @@ function ns(s){return(s||'').replace(/\D/g,'').replace(/^00964/,'').replace(/^96
 function pd(s){
   if(!s)return new Date(0);
   s=String(s).trim();
+  // gviz Date(year,month,day) - months 0-indexed
   var gm=s.match(/^Date\((\d+),(\d+),(\d+)\)/);
   if(gm)return new Date(parseInt(gm[1]),parseInt(gm[2]),parseInt(gm[3]));
+  // Arabic numerals + RTL mark
   var ar={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
   for(var k in ar)s=s.split(k).join(ar[k]);
   s=s.replace(/\u200f/g,'').trim();
-  var m=s.match(/(\d+)\/(\d+)\/(\d+)/);
+  // Extract date parts
+  var m=s.match(/(\d+)[\/\-](\d+)[\/\-](\d+)/);
   if(!m)return new Date(0);
-  var d=parseInt(m[1]),mo=parseInt(m[2]),y=parseInt(m[3]);
-  if(y<100){var tmp=y;y=d;d=tmp;}
+  var a=parseInt(m[1]),b=parseInt(m[2]),c=parseInt(m[3]);
+  var y,mo,d;
+  // YYYY/MM/DD or YYYY-MM-DD: a >= 2000
+  if(a>=2000){y=a;mo=b;d=c;}
+  // last part is year (>= 2000)
+  else if(c>=2000){
+    if(a>12){y=c;mo=b;d=a;} // DD/MM/YYYY
+    else if(b>12){y=c;mo=a;d=b;} // MM/DD/YYYY
+    else{y=c;mo=b;d=a;} // default DD/MM/YYYY (Iraqi)
+  }
+  else return new Date(0);
+  // Time
   var t=s.match(/(\d+):(\d+)/),h=t?parseInt(t[1]):0,mn=t?parseInt(t[2]):0;
   if(s.includes('م')&&h<12)h+=12;
   if(s.includes('ص')&&h===12)h=0;
