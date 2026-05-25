@@ -281,10 +281,12 @@ function normTech(t) {
 function normKey(n) {
   if (!n) return '';
   var s = n.trim().toLowerCase();
-  // توحيد الأرقام العربية للإنجليزية
+  // توحيد الأرقام العربية
   var nums={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
   for(var k in nums) s=s.split(k).join(nums[k]);
-  // توحيد chicken بكل أشكاله
+  // رقم في نهاية الاسم = الكرادة (مثل 62، 42، 52)
+  s=s.replace(/\s+(\d{2})\s*$/,' كراده');
+  // توحيد chicken
   s=s.replace(/تشيكن|تشكين|تشكن|شكين|شكن|شيكين|شيكن|جيكن|تشيكين/g,'جكن');
   s=s.replace(/جكنن/g,'جكن');
   // توحيد المناطق
@@ -313,7 +315,6 @@ function normKey(n) {
   s=s.replace(/ة/g,'ه');
   // توحيد الألف
   s=s.replace(/[إأآ]/g,'ا').replace(/ى/g,'ي');
-  // إزالة مسافات متعددة
   s=s.replace(/\s+/g,' ').trim();
   return s;
 }
