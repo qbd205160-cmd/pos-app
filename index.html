@@ -313,6 +313,25 @@ function normKey(n) {
   return s;
 }
 
+// أحدث تاريخ لفرع من جميع الشيتات
+function latestDate(br) {
+  var best = new Date(0);
+  (br.dash||[]).forEach(function(r){var d=pd(cv(r,'submittedAt'));if(d>best)best=d;});
+  (br.tvf||[]).forEach(function(r){var d=pd(cv(r,'Timestamp','كرل دايت'));if(d>best)best=d;});
+  return best;
+}
+
+// أحدث سجل dashboard لفرع
+function latestDash(br) {
+  if(!br.dash||!br.dash.length) return null;
+  var best=br.dash[0], bestD=pd(cv(br.dash[0],'submittedAt'));
+  for(var i=1;i<br.dash.length;i++){
+    var d=pd(cv(br.dash[i],'submittedAt'));
+    if(d>bestD){bestD=d;best=br.dash[i];}
+  }
+  return best;
+}
+
 function score(name,q) {
   name=(name||'').toLowerCase().trim(); q=(q||'').toLowerCase().trim();
   if (!name||!q) return 0;
@@ -647,11 +666,7 @@ function buildCard(data) {
 
 // renderNameCard
 function renderNameCard(br) {
-  // ترتيب من الأحدث للأقدم قبل العرض
-  if(br.dash&&br.dash.length>1){
-    br.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
-  }
-  var t=br.dash&&br.dash.length?br.dash[0]:null;
+  var t=latestDash(br);
   var tv=br.tvf&&br.tvf.length?br.tvf[0]:null;
   var si=br.si&&br.si.length?br.si[0]:null;
   var stk=br.stk&&br.stk.length?br.stk[0]:null;
