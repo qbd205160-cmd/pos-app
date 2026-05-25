@@ -229,12 +229,21 @@ function nd(s) { return (s||'').toLowerCase().replace(/[\s\-]/g,''); }
 function ns(s) { return (s||'').replace(/\D/g,'').replace(/^00964/,'').replace(/^964/,'').replace(/^0/,'').slice(-9); }
 function pd(s) {
   if (!s) return new Date(0);
-  s = String(s).replace(/[٠-٩]/g, function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);}).trim();
-  var m = s.match(/(\d+)\/(\d+)\/(\d+)/); if (!m) return new Date(0);
-  var y=parseInt(m[3]),mo=parseInt(m[2]),d=parseInt(m[1]);
-  if (y<100){var tmp=y;y=d;d=tmp;}
+  s = String(s).trim();
+  // gviz Date(year,month,day) - months 0-indexed
+  var gm = s.match(/^Date\((\d+),(\d+),(\d+)\)/);
+  if (gm) return new Date(parseInt(gm[1]), parseInt(gm[2]), parseInt(gm[3]));
+  // Arabic numerals + RTL mark
+  var ar={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+  for(var k in ar) s=s.split(k).join(ar[k]);
+  s=s.replace(/\u200f/g,'').trim();
+  var m=s.match(/(\d+)\/(\d+)\/(\d+)/);
+  if(!m) return new Date(0);
+  var d=parseInt(m[1]),mo=parseInt(m[2]),y=parseInt(m[3]);
+  if(y<100){var tmp=y;y=d;d=tmp;}
   var t=s.match(/(\d+):(\d+)/),h=t?parseInt(t[1]):0,mn=t?parseInt(t[2]):0;
-  if (s.includes('م')&&h<12) h+=12;
+  if(s.includes('م')&&h<12)h+=12;
+  if(s.includes('ص')&&h===12)h=0;
   return new Date(y,mo-1,d,h,mn);
 }
 function bdg(s) { var m={'نشط':'sn','Active':'sn','active':'sn','live':'sn','جديد':'sj','انتظار':'sw'}; return m[s]||'sx'; }
@@ -510,7 +519,13 @@ function buildCard(data) {
   if(stat)h+=sf('📊','الحالة',stat,stat==='نشط'||stat==='Active'?'fg':'','gr');
   if(simst)h+=sf('📡','حالة السيم',simst,simst==='4G'?'fg':simst==='غير فعال'?'fr':'');
   if(posT&&posT.length>1&&posT!=='عدم توفر')h+=sf('🖨️','نوع الجهاز',posT);
-  if(date)h+=sf('📅','آخر تاسك',date,'fb','bl');
+  if(date){
+    // تحويل Date(y,m,d) لنص مقروء
+    var dispDate=date;
+    var gdm=date.match(/^Date\((\d+),(\d+),(\d+)\)/);
+    if(gdm){var gmo=parseInt(gdm[2])+1;dispDate=parseInt(gdm[3])+'/'+(gmo)+'/' +gdm[1];}
+    h+=sf('📅','آخر تاسك',dispDate,'fb','bl');
+  }
   if(tech)h+=sf('👤','آخر فني',tech);
   if(reason&&reason.length>1)h+=sf('🔧','سبب الزيارة',reason);
   if(cc&&cc.length>1)h+=sf('📞','كول سنتر',cc);
