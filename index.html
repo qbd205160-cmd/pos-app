@@ -421,9 +421,9 @@ function bySim(q) {
 // By name
 function byName(q) {
   var byN={};
-  D.dash.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].dash.push(r);if(s>byN[n].sc)byN[n].sc=s;}});
-  D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].tvf.push(r);}});
-  D.sim.forEach(function(r){var n=cv(r,'اسم المطعم');var s=score(n,q);if(s>0.3){if(!byN[n])byN[n]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[n].si.push(r);}});
+  D.dash.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].dash.push(r);if(s>byN[key].sc){byN[key].sc=s;byN[key].name=n;}}});
+  D.tvf4.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].tvf.push(r);}});
+  D.sim.forEach(function(r){var n=cv(r,'اسم المطعم');if(!n)return;var s=score(n,q);if(s>0.3){var key=normKey(n);if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],stk:[],si:[]};byN[key].si.push(r);}});
   if (!Object.keys(byN).length) {noRes(q);return;}
   var list=Object.values(byN).sort(function(a,b){return b.sc-a.sc;});
   var best=list[0].sc;
