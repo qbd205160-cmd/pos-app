@@ -143,6 +143,7 @@ var TVF_S7='Sheet7';
 var TVF_S8='Sheet8';
 var STOCK='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
 var SIM55='1Fwyln1_-ogHjvfnoQnI2tdXTWGRosThZofgjWU2TSl8';
+var M2MTP_ID='1m6AHs66KJ5RbvQUu5vvM0HGmNalMwElS7LBlk8yVEJA';
 var TRACK='1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
 var TRACK_S='tracking';
 
@@ -171,7 +172,7 @@ async function gviz(id,sheet){
 // ── Load ─────────────────────────────────────────────────────
 async function loadAll(){
   setSt('ld','جاري تحميل...');
-  D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],track:[]};
+  D={dash:[],tvf:[],tvf4:[],stock:[],sim:[],track:[],m2mtp:{}};
   loaded=false;
   try{
     // تحميل كل الشيتات بالتوازي
@@ -186,7 +187,8 @@ async function loadAll(){
       gviz(TVF,TVF_S8).catch(function(){return [];}),
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
-      gviz(TRACK,TRACK_S).catch(function(){return [];})
+      gviz(TRACK,TRACK_S).catch(function(){return [];}),
+      gviz(M2MTP_ID,'Sheet1').catch(function(){return [];})
     ]);
     D.dash=r[0].concat(r[1]);
     D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
@@ -196,6 +198,18 @@ async function loadAll(){
     D.stock=r[8];
     D.sim=r[9];
     D.track=r[10];
+    // بناء lookup: ICCID → MSISDN من شيت M2MTP
+    var m2raw=r[11]||[];
+    D.m2mtp={};
+    m2raw.forEach(function(row){
+      var iccid=cv(row,'ICCID');
+      var msisdn=cv(row,'MSISDN');
+      if(iccid&&msisdn){
+        // تخزين بصيغ متعددة: مع وبدون أصفار بادئة
+        D.m2mtp[iccid.trim()]=msisdn.trim();
+        D.m2mtp[iccid.trim().replace(/^0+/,'')]=msisdn.trim();
+      }
+    });
     loaded=true;
     setSt('ok','✅ '+D.dash.length+' dash · '+(D.tvf.length+D.tvfR.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim');
     buildRepFilters();
@@ -562,6 +576,26 @@ function renderNameCard(br){
 }
 
 // ── Build Card ────────────────────────────────────────────────
+// تحويل ICCID إلى MSISDN إذا كان الرقم ICCID
+function iccid2msisdn(num){
+  if(!num||num.length<10)return num;
+  // MSISDN عراقي يبدأ بـ 078 أو 7 وطوله 10-11 رقم
+  // ICCID طوله >= 12 رقم
+  var clean=num.replace(/\s/g,'');
+  if(clean.length>=12){
+    // جرب البحث مباشرة
+    if(D.m2mtp[clean])return D.m2mtp[clean];
+    // بدون أصفار بادئة
+    var stripped=clean.replace(/^0+/,'');
+    if(D.m2mtp[stripped])return D.m2mtp[stripped];
+    // أخذ آخر 12 رقم
+    var last12=clean.slice(-12);
+    if(D.m2mtp[last12])return D.m2mtp[last12];
+    // لم يُوجد — أرجع الرقم الأصلي
+    return num;
+  }
+  return num;
+}
 function buildCard(data){
   var t=latestDash(data)||null;
   var tv=data.tvf&&data.tvf.length?data.tvf[0]:null;
@@ -570,7 +604,8 @@ function buildCard(data){
   var si=data.sim55&&data.sim55.length?data.sim55[0]:null;
 
   var dev=data.dev||(t?cv(t,'رقم جهاز POS'):tv4?cv(tv4,'POS number'):tv?fdev(tv):stk?cv(stk,'vs','VS'):'');
-  var sim=data.sim||(t?cv(t,'رقم SIM كارت POS'):tv4?cv(tv4,'SIM number'):tv?cv(tv,'رقم السم كارت'):si?cv(si,'ارقام'):'');
+  var simRaw=data.sim||(t?cv(t,'رقم SIM كارت POS'):tv4?cv(tv4,'SIM number'):tv?cv(tv,'رقم السم كارت'):si?cv(si,'ارقام'):'');
+  var sim=iccid2msisdn(simRaw);
   var name=data.name||'';
   var addr=t?cv(t,'العنوان'):'';
   var email=si?cv(si,'الايميل'):'';
