@@ -578,22 +578,24 @@ function renderNameCard(br){
 // ── Build Card ────────────────────────────────────────────────
 // تحويل ICCID إلى MSISDN إذا كان الرقم ICCID
 function iccid2msisdn(num){
-  if(!num||num.length<10)return num;
-  // MSISDN عراقي يبدأ بـ 078 أو 7 وطوله 10-11 رقم
-  // ICCID طوله >= 12 رقم
-  var clean=num.replace(/\s/g,'');
-  if(clean.length>=12){
-    // جرب البحث مباشرة
-    if(D.m2mtp[clean])return D.m2mtp[clean];
-    // بدون أصفار بادئة
-    var stripped=clean.replace(/^0+/,'');
-    if(D.m2mtp[stripped])return D.m2mtp[stripped];
-    // أخذ آخر 12 رقم
-    var last12=clean.slice(-12);
-    if(D.m2mtp[last12])return D.m2mtp[last12];
-    // لم يُوجد — أرجع الرقم الأصلي
-    return num;
-  }
+  if(!num||num.length<8)return num;
+  var clean=num.replace(/[\s\-]/g,'');
+  // MSISDN عراقي: يبدأ بـ 07 أو 7 أو 9647 وطوله 10 أو أقل
+  var isMSISDN=(clean.startsWith('07')||clean.startsWith('9647')||
+               (clean.startsWith('7')&&clean.length<=10));
+  if(isMSISDN)return num; // رقم سيم حقيقي — لا تحويل
+  // غير ذلك → جرب الإيجاد في M2MTP (ICCID)
+  if(!D.m2mtp||Object.keys(D.m2mtp).length===0)return num;
+  // جرب مباشرة
+  if(D.m2mtp[clean])return D.m2mtp[clean];
+  // جرب مع صفر بادئ
+  if(D.m2mtp['0'+clean])return D.m2mtp['0'+clean];
+  // جرب بدون أصفار بادئة
+  var stripped=clean.replace(/^0+/,'');
+  if(D.m2mtp[stripped])return D.m2mtp[stripped];
+  // جرب كل احتمالات الأصفار البادئة (0، 00)
+  if(D.m2mtp['00'+clean])return D.m2mtp['00'+clean];
+  // لم يُوجد — أرجع الأصلي
   return num;
 }
 function buildCard(data){
