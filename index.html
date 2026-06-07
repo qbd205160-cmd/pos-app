@@ -188,7 +188,8 @@ async function loadAll(){
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
       gviz(TRACK,TRACK_S).catch(function(){return [];}),
-      gviz(M2MTP_ID,'Sheet1').catch(function(){return [];})
+      gviz(M2MTP_ID,'Sheet1').catch(function(){return [];}),
+      gviz(M2MTP_ID,'الورقة1').catch(function(){return [];})
     ]);
     D.dash=r[0].concat(r[1]);
     D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
@@ -198,16 +199,34 @@ async function loadAll(){
     D.stock=r[8];
     D.sim=r[9];
     D.track=r[10];
-    // بناء lookup: ICCID → MSISDN من شيت M2MTP
-    var m2raw=r[11]||[];
+    // بناء lookup: ICCID → MSISDN من شيت M2MTP (Sheet1 + الورقة1)
+    var m2raw=(r[11]||[]).concat(r[12]||[]);
     D.m2mtp={};
+    function addM2(iccid,msisdn){
+      if(!iccid||!msisdn)return;
+      var ic=(''+iccid).trim().replace(/[\s,]/g,'');
+      var ms=(''+msisdn).trim().replace(/[\s,]/g,'');
+      if(!ic||!ms)return;
+      // تخزين بكل الصيغ الممكنة
+      D.m2mtp[ic]=ms;
+      D.m2mtp[ic.replace(/^\.0+/,'')]=ms;
+      var stripped=ic.replace(/^0+/,'');
+      D.m2mtp[stripped]=ms;
+      D.m2mtp['0'+stripped]=ms;
+      D.m2mtp['00'+stripped]=ms;
+    }
     m2raw.forEach(function(row){
+      // Sheet1: أعمدة ICCID و MSISDN
       var iccid=cv(row,'ICCID');
       var msisdn=cv(row,'MSISDN');
-      if(iccid&&msisdn){
-        // تخزين بصيغ متعددة: مع وبدون أصفار بادئة
-        D.m2mtp[iccid.trim()]=msisdn.trim();
-        D.m2mtp[iccid.trim().replace(/^0+/,'')]=msisdn.trim();
+      if(iccid&&msisdn){addM2(iccid,msisdn);return;}
+      // الورقة1: عمودان بدون header — العمود الأول ICCID، الثاني MSISDN
+      var keys=Object.keys(row);
+      if(keys.length>=2){
+        var v0=row[keys[0]],v1=row[keys[1]];
+        if(v0&&v1&&typeof v0!=='object'&&typeof v1!=='object'){
+          addM2(''+v0,''+v1);
+        }
       }
     });
     loaded=true;
