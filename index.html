@@ -204,16 +204,18 @@ async function loadAll(){
     D.m2mtp={};
     function addM2(iccid,msisdn){
       if(!iccid||!msisdn)return;
-      var ic=(''+iccid).trim().replace(/[\s,]/g,'');
-      var ms=(''+msisdn).trim().replace(/[\s,]/g,'');
-      if(!ic||!ms)return;
-      // تخزين بكل الصيغ الممكنة
-      D.m2mtp[ic]=ms;
-      D.m2mtp[ic.replace(/^\.0+/,'')]=ms;
+      // تنظيف القيم: إزالة المسافات والفواصل والنقاط العائمة
+      var ic=(''+iccid).trim().replace(/[\s,]/g,'').replace(/\.0+$/,'');
+      var ms=(''+msisdn).trim().replace(/[\s,]/g,'').replace(/\.0+$/,'');
+      if(!ic||!ms||ic.length<6)return;
+      // تخزين بكل الصيغ الممكنة لضمان الإيجاد
+      function store(k){if(k&&k.length>=6)D.m2mtp[k]=ms;}
+      store(ic);
       var stripped=ic.replace(/^0+/,'');
-      D.m2mtp[stripped]=ms;
-      D.m2mtp['0'+stripped]=ms;
-      D.m2mtp['00'+stripped]=ms;
+      store(stripped);
+      store('0'+stripped);
+      store('00'+stripped);
+      store('000'+stripped);
     }
     m2raw.forEach(function(row){
       // Sheet1: أعمدة ICCID و MSISDN
@@ -597,25 +599,23 @@ function renderNameCard(br){
 // ── Build Card ────────────────────────────────────────────────
 // تحويل ICCID إلى MSISDN إذا كان الرقم ICCID
 function iccid2msisdn(num){
-  if(!num||num.length<8)return num;
-  var clean=num.replace(/[\s\-]/g,'');
-  // MSISDN عراقي: يبدأ بـ 07 أو 7 أو 9647 وطوله 10 أو أقل
-  var isMSISDN=(clean.startsWith('07')||clean.startsWith('9647')||
-               (clean.startsWith('7')&&clean.length<=10));
-  if(isMSISDN)return num; // رقم سيم حقيقي — لا تحويل
-  // غير ذلك → جرب الإيجاد في M2MTP (ICCID)
+  if(!num)return num;
+  // تنظيف: إزالة مسافات وشرطات وأصفار عائمة
+  var clean=(''+num).trim().replace(/[\s\-]/g,'').replace(/\.0+$/,'');
+  if(clean.length<6)return num;
+  // MSISDN عراقي الحقيقي: يبدأ بـ 07 أو 9647 أو 7 وطوله ≤11
+  var isMSISDN=(
+    (clean.startsWith('07')&&clean.length===11)||
+    (clean.startsWith('9647')&&clean.length>=12)||
+    (clean.startsWith('7')&&clean.length<=10)
+  );
+  if(isMSISDN)return clean; // رقم سيم صحيح — لا تحويل
+  // غير ذلك → ICCID، ابحث في M2MTP
   if(!D.m2mtp||Object.keys(D.m2mtp).length===0)return num;
-  // جرب مباشرة
-  if(D.m2mtp[clean])return D.m2mtp[clean];
-  // جرب مع صفر بادئ
-  if(D.m2mtp['0'+clean])return D.m2mtp['0'+clean];
-  // جرب بدون أصفار بادئة
   var stripped=clean.replace(/^0+/,'');
-  if(D.m2mtp[stripped])return D.m2mtp[stripped];
-  // جرب كل احتمالات الأصفار البادئة (0، 00)
-  if(D.m2mtp['00'+clean])return D.m2mtp['00'+clean];
-  // لم يُوجد — أرجع الأصلي
-  return num;
+  return D.m2mtp[clean]||D.m2mtp[stripped]||
+         D.m2mtp['0'+stripped]||D.m2mtp['00'+stripped]||
+         D.m2mtp['000'+stripped]||num;
 }
 function buildCard(data){
   var t=latestDash(data)||null;
