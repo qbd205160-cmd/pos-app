@@ -588,7 +588,7 @@ async function loadAll() {
 
     // ② Build sim55 map (MSISDN→info)
     sim55Raw.forEach(function(r){
-      var ms = (r['ارقام']||r['ارقام '||'']).trim().replace(/\.0+$/,'');
+      var ms = (r['ارقام']||r['ارقام ']||'').trim().replace(/\.0+$/,'');
       if (ms && ms!=='#N/A' && ms.length>4) {
         sim55Map[ms] = {
           email: r['انك']||r['email']||'',
@@ -647,3 +647,4 @@ loadAll();
 </script>
 </body>
 </html>
+
