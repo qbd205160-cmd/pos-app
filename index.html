@@ -8,539 +8,829 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;direction:rtl;font-size:14px}
 
-/* ── Top Bar ─────────────────── */
-.top{background:#161b27;border-bottom:1px solid #1e2a3d;padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:200}
-.logo{font-size:16px;font-weight:800;color:#60a5fa}
-.top-tabs{display:flex;gap:4px;flex:1;justify-content:center}
-.tab{padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;color:#64748b;transition:all .2s;background:none;border:none}
+/* Top Bar */
+.top{background:#161b27;border-bottom:1px solid #1e2a3d;padding:10px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:200;flex-wrap:wrap}
+.logo{font-size:15px;font-weight:800;color:#60a5fa;white-space:nowrap}
+.top-tabs{display:flex;gap:4px;flex:1;justify-content:center;flex-wrap:wrap}
+.tab{padding:5px 14px;border-radius:20px;font-size:12px;cursor:pointer;color:#64748b;transition:all .2s;background:none;border:none;font-family:inherit}
 .tab.on{background:#1d4ed8;color:#fff}
-.st-dot{width:8px;height:8px;border-radius:50%;background:#fbbf24}
-.st-txt{font-size:11px;color:#64748b}
+.st-dot{width:8px;height:8px;border-radius:50%;background:#fbbf24;flex-shrink:0}
+.st-txt{font-size:11px;color:#64748b;white-space:nowrap}
 
-/* ── Search ──────────────────── */
-.srch-wrap{padding:12px 14px 6px}
-.srch{width:100%;background:#1e2535;border:1.5px solid #2d3748;border-radius:10px;padding:10px 14px;font-size:14px;color:#e2e8f0;outline:none;direction:rtl}
-.srch:focus{border-color:#60a5fa}
-.srch::placeholder{color:#475569}
+/* Search bar */
+.srch-wrap{padding:12px 16px;background:#0f1117;position:sticky;top:49px;z-index:100}
+.srch-box{display:flex;gap:8px;align-items:center;background:#161b27;border:1px solid #1e2a3d;border-radius:10px;padding:8px 12px}
+.srch-box input{flex:1;background:none;border:none;outline:none;color:#e2e8f0;font-size:14px;font-family:inherit;direction:rtl;min-width:0}
+.srch-box input::placeholder{color:#334155}
+.srch-btn{padding:6px 16px;background:#1d4ed8;border:none;border-radius:7px;color:#fff;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap}
 
-/* ── Filters ─────────────────── */
-.ftrs{padding:4px 14px 8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.ftrs::-webkit-scrollbar{display:none}
-.ftr{background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:4px 11px;font-size:11px;color:#94a3b8;cursor:pointer;white-space:nowrap;transition:all .15s;user-select:none}
-.ftr.on{background:#1d4ed8;border-color:#3b82f6;color:#fff}
+/* Filter pills */
+.filters{display:flex;gap:6px;padding:0 16px 12px;flex-wrap:wrap}
+.ftr{padding:4px 12px;border-radius:20px;font-size:11px;cursor:pointer;background:#161b27;border:1px solid #1e2a3d;color:#64748b;transition:all .15s;white-space:nowrap}
+.ftr.on{border-color:#3b82f6;color:#93c5fd;background:rgba(59,130,246,.12)}
 
-/* ── Stats ───────────────────── */
-.sbar{display:flex;background:#161b27;border-bottom:1px solid #1e2a3d}
-.sc{flex:1;padding:8px;text-align:center;border-left:1px solid #1e2a3d}
-.sc:last-child{border-left:none}
-.sn{font-size:17px;font-weight:800;color:#60a5fa}
-.sl{font-size:10px;color:#64748b;margin-top:1px}
+/* Stats bar */
+.stats{display:flex;gap:1px;padding:0 16px 12px;flex-wrap:wrap}
+.stat{flex:1;min-width:80px;background:#161b27;border:1px solid #1e2a3d;border-radius:8px;padding:8px 10px;text-align:center;margin:2px}
+.stat-n{font-size:18px;font-weight:800;color:#60a5fa}
+.stat-l{font-size:10px;color:#475569;margin-top:2px}
 
-/* ── Results ─────────────────── */
-.res{padding:8px 12px}
-.empty{text-align:center;padding:60px 20px;color:#374151;font-size:13px}
+/* Cards */
+#out{padding:0 16px 24px}
+.rest-card{background:#161b27;border:1px solid #1e2a3d;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.rc-head{padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.rc-head:hover{background:rgba(59,130,246,.06)}
+.rc-name{font-size:14px;font-weight:700;color:#f1f5f9;flex:1}
+.rc-meta{font-size:11px;color:#475569;margin-top:3px;line-height:1.6}
+.rc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.bdg{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600}
+.bdg-active{background:#052e16;border:1px solid #166534;color:#4ade80}
+.bdg-new{background:#172554;border:1px solid #1e40af;color:#93c5fd}
+.bdg-wait{background:#1c1002;border:1px solid #713f12;color:#fbbf24}
+.bdg-4g{background:#064e3b;border:1px solid #065f46;color:#6ee7b7}
+.bdg-off{background:#1c0202;border:1px solid #7f1d1d;color:#f87171}
+.bdg-dev{background:#1e1b4b;border:1px solid #3730a3;color:#a5b4fc}
+.rc-arrow{font-size:12px;color:#334155;margin-top:2px;flex-shrink:0}
 
-/* ── Card ────────────────────── */
-.card{background:#161b27;border:1px solid #1e2a3d;border-radius:12px;margin-bottom:9px;overflow:hidden}
-.card-hd{padding:11px 13px;display:flex;align-items:flex-start;gap:8px;cursor:pointer}
-.card-hd:hover{background:rgba(96,165,250,.04)}
-.cname{font-size:14px;font-weight:700;color:#e2e8f0;flex:1;line-height:1.3}
-.caddr{font-size:11px;color:#64748b;margin-top:2px}
-.bdg{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap}
-.bn{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
-.bj{background:rgba(96,165,250,.15);color:#60a5fa;border:1px solid rgba(96,165,250,.3)}
-.bw{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
-.card-body{padding:0 13px 10px;display:flex;flex-wrap:wrap;gap:5px}
-.chip{display:flex;align-items:center;gap:4px;border:1px solid #1e2a3d;border-radius:7px;padding:3px 8px;font-size:11px;color:#94a3b8;background:#0f1117}
-.chip.pos{border-color:#1d4ed8;color:#93c5fd;background:rgba(29,78,216,.1)}
-.chip.sim{border-color:#065f46;color:#34d399;background:rgba(6,95,70,.12)}
-.chip.sim2{border-color:#374151;color:#6b7280;font-size:10px}
-.chip.act{border-color:#065f46;color:#22c55e}
-.chip.ina{border-color:#7f1d1d;color:#f87171}
-.note-txt{padding:0 13px 9px;font-size:11px;color:#475569;line-height:1.5}
+/* Task detail */
+.rc-detail{display:none;border-top:1px solid #1e2a3d}
+.rc-detail.open{display:block}
+.task-item{padding:10px 14px;border-bottom:1px solid #111827;background:#0f1117}
+.task-item:last-child{border-bottom:none}
+.task-latest{background:#0d1a2e!important;border-right:3px solid #3b82f6}
+.task-hdr{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.task-date{font-size:11px;color:#60a5fa;font-weight:600}
+.task-tech{font-size:11px;color:#94a3b8}
+.task-reason{font-size:11px;color:#fbbf24}
+.task-status{padding:1px 7px;border-radius:8px;font-size:10px}
+.task-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.task-field{background:#161b27;border-radius:6px;padding:6px 8px}
+.tf-lbl{font-size:9px;color:#475569;margin-bottom:2px}
+.tf-val{font-size:11px;color:#cbd5e1;word-break:break-all}
+.tf-val.hi{color:#60a5fa;font-weight:700}
+.tf-val.sim{color:#fb923c}
+.tf-val.grn{color:#4ade80}
+.tf-val.red{color:#f87171}
+.task-notes{margin-top:6px;padding:7px 9px;background:#0a0f1a;border-radius:6px;font-size:11px;color:#94a3b8;line-height:1.6}
+.task-full{grid-column:1/-1}
+.tvf-section{padding:8px 14px;background:#0a0a14;border-top:1px solid #1e1e3a}
+.tvf-hdr{font-size:10px;color:#8b5cf6;margin-bottom:6px;font-weight:600}
+.tvf-item{padding:6px 8px;background:#12122a;border-radius:6px;margin-bottom:4px;font-size:11px;color:#a78bfa;border:1px solid #1e1e3a}
 
-/* ── History ─────────────────── */
-.tog{width:100%;background:none;border:none;border-top:1px solid #1e2a3d;padding:7px;color:#374151;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
-.tog:hover{color:#60a5fa;background:rgba(96,165,250,.04)}
-.hist{display:none;border-top:1px solid #1e2a3d}
-.hist.open{display:block}
-.hi{padding:9px 13px;border-bottom:1px dashed #1e2a3d}
-.hi:last-child{border-bottom:none}
-.hi-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px}
-.hi-d{font-size:10px;color:#374151}
-.hi-t{font-size:11px;color:#6b7280}
-.hi-r{font-size:11px;color:#7dd3fc}
-.hi-n{font-size:10px;color:#374151;margin-top:2px}
+/* Empty */
+.empty{text-align:center;padding:60px 20px;color:#334155;font-size:14px}
 
-/* ── Reports tab ─────────────── */
-.rep{padding:12px 14px}
-.rep-card{background:#161b27;border:1px solid #1e2a3d;border-radius:10px;margin-bottom:8px;padding:12px 14px}
-.rep-name{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
-.rep-row{display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:3px}
-.rep-val{color:#60a5fa;font-weight:600}
+/* Report tab */
+#tab-report{padding:16px}
+.rep-section{margin-bottom:20px}
+.rep-section h3{font-size:12px;color:#64748b;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #1e2a3d}
 
-/* ── Loader ──────────────────── */
-.ld{text-align:center;padding:50px 20px;color:#4a5568;font-size:13px}
-.spin{display:inline-block;width:18px;height:18px;border:2px solid #1e2a3d;border-top-color:#60a5fa;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-left:6px}
-@keyframes sp{to{transform:rotate(360deg)}}
+/* Report filters */
+.rep-filters{background:#161b27;border:1px solid #1e2a3d;border-radius:10px;padding:14px;margin-bottom:16px}
+.rep-filters h3{font-size:12px;color:#94a3b8;margin-bottom:12px}
+.rep-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.rep-label{font-size:11px;color:#64748b;min-width:60px}
+.rep-select{flex:1;min-width:120px;padding:6px 10px;background:#0f1117;border:1px solid #1e2a3d;border-radius:6px;color:#e2e8f0;font-size:12px;font-family:inherit}
+.rep-input{flex:1;min-width:100px;padding:6px 10px;background:#0f1117;border:1px solid #1e2a3d;border-radius:6px;color:#e2e8f0;font-size:12px;font-family:inherit}
+.rep-btn{padding:7px 18px;background:#1d4ed8;border:none;border-radius:7px;color:#fff;cursor:pointer;font-size:12px;font-family:inherit}
+.rep-card{background:#161b27;border:1px solid #1e2a3d;border-radius:8px;padding:12px;margin-bottom:8px}
+.rep-name{font-size:13px;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+.rep-stat-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #111827}
+.rep-stat-row:last-child{border-bottom:none}
+.rep-val{font-weight:700;color:#60a5fa}
+.task-row{background:#0f1117;border-radius:6px;padding:8px 10px;margin-bottom:5px;font-size:11px;border:1px solid #1e2a3d}
+.task-row-hdr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.export-btn{padding:6px 14px;background:#059669;border:none;border-radius:7px;color:#fff;cursor:pointer;font-size:11px;font-family:inherit;margin-top:10px}
+
+/* Loading */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.loading-spin{display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,.2);border-top-color:#60a5fa;border-radius:50%;animation:spin .7s linear infinite}
 </style>
 </head>
 <body>
 
 <div class="top">
-  <div class="logo">📟 POS</div>
+  <div class="logo">🖨 POS</div>
   <div class="top-tabs">
     <button class="tab on" onclick="switchTab('search',this)">🔍 بحث</button>
     <button class="tab" onclick="switchTab('report',this)">📊 تقارير</button>
   </div>
-  <div style="display:flex;align-items:center;gap:5px">
-    <span class="st-dot" id="dot"></span>
-    <span class="st-txt" id="stxt">تحميل...</span>
+  <div style="display:flex;align-items:center;gap:6px">
+    <div class="st-dot" id="dot" style="animation:pulse 1.5s infinite"></div>
+    <span class="st-txt" id="stxt">جاري التحميل...</span>
   </div>
 </div>
 
 <!-- SEARCH TAB -->
 <div id="tab-search">
   <div class="srch-wrap">
-    <input class="srch" id="q" placeholder="🔍 بحث بالاسم، رقم الجهاز، رقم السيم، الفني..." oninput="doSearch()" autocomplete="off">
+    <div class="srch-box">
+      <span style="font-size:16px">🔍</span>
+      <input id="si" placeholder="بحث بالاسم، رقم الجهاز، رقم السيم، الفني..." onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="srch-btn" onclick="doSearch()">بحث</button>
+    </div>
   </div>
-  <div class="ftrs">
-    <div class="ftr on" onclick="setF('all',this)">الكل</div>
-    <div class="ftr" onclick="setF('نشط',this)">✅ نشط</div>
-    <div class="ftr" onclick="setF('جديد',this)">🆕 جديد</div>
-    <div class="ftr" onclick="setF('انتظار',this)">⏳ انتظار</div>
-    <div class="ftr" onclick="setF('4G',this)">📡 4G</div>
-    <div class="ftr" onclick="setF('غير فعال',this)">🚫 سيم مقطوع</div>
+
+  <div class="filters">
+    <button class="ftr on" onclick="setFtr('',this)">الكل</button>
+    <button class="ftr" onclick="setFtr('نشط',this)">✅ نشط</button>
+    <button class="ftr" onclick="setFtr('جديد',this)">🆕 جديد</button>
+    <button class="ftr" onclick="setFtr('انتظار',this)">⏳ انتظار</button>
+    <button class="ftr" onclick="setFtr('4G',this)">📡 4G</button>
+    <button class="ftr" onclick="setFtr('sim-off',this)">🚫 سيم مقطوع</button>
   </div>
-  <div class="sbar">
-    <div class="sc"><div class="sn" id="s0">-</div><div class="sl">إجمالي</div></div>
-    <div class="sc"><div class="sn" id="s1" style="color:#22c55e">-</div><div class="sl">نشط</div></div>
-    <div class="sc"><div class="sn" id="s2" style="color:#60a5fa">-</div><div class="sl">جديد</div></div>
-    <div class="sc"><div class="sn" id="s3" style="color:#fbbf24">-</div><div class="sl">انتظار</div></div>
-    <div class="sc"><div class="sn" id="s4" style="color:#f87171">-</div><div class="sl">سيم مقطوع</div></div>
-  </div>
-  <div id="out" class="res"><div class="ld"><span class="spin"></span> جاري التحميل...</div></div>
+
+  <div class="stats" id="statsBar"></div>
+
+  <div id="out"><div class="empty">🖨️<br><br>ابحث عن أي مطعم أو جهاز أو سيم</div></div>
 </div>
 
-<!-- REPORTS TAB -->
+<!-- REPORT TAB -->
 <div id="tab-report" style="display:none">
-  <div class="rep" id="repOut"><div class="ld"><span class="spin"></span> تحميل...</div></div>
+  <div class="rep-filters">
+    <h3>🔎 فلترة التقارير</h3>
+    <div class="rep-row">
+      <span class="rep-label">الفني</span>
+      <select class="rep-select" id="rTech">
+        <option value="">الكل</option>
+      </select>
+    </div>
+    <div class="rep-row">
+      <span class="rep-label">من تاريخ</span>
+      <input type="date" class="rep-input" id="rFrom">
+      <span class="rep-label" style="min-width:40px">إلى</span>
+      <input type="date" class="rep-input" id="rTo">
+    </div>
+    <div class="rep-row">
+      <span class="rep-label">سبب الزيارة</span>
+      <select class="rep-select" id="rReason">
+        <option value="">الكل</option>
+      </select>
+    </div>
+    <div class="rep-row">
+      <span class="rep-label">الحالة</span>
+      <select class="rep-select" id="rStatus">
+        <option value="">الكل</option>
+        <option value="نشط">نشط</option>
+        <option value="جديد">جديد</option>
+        <option value="انتظار">انتظار</option>
+      </select>
+    </div>
+    <div class="rep-row">
+      <button class="rep-btn" onclick="renderReport()">تطبيق الفلتر</button>
+      <button class="rep-btn" style="background:#1e293b" onclick="resetReport()">إعادة تعيين</button>
+      <button class="export-btn" onclick="exportCSV()">📥 تصدير CSV</button>
+    </div>
+  </div>
+  <div id="repOut"></div>
 </div>
 
 <script>
-// ══════════════════════════════════════════
-// IDs
-// ══════════════════════════════════════════
+// ═══ Sheet IDs ═══
 var DASH  = '1TnlxGwD0G6FV654bFCbXmjL4Ek59IGJWkAYYlb_GD7w';
 var TVF   = '11iL-WTrWcw9hSn5YD6i1LvLnczMrFu0HInjXmBUCFmo';
 var STOCK = '1ZOB4rHFil99StMeaCPm59lDT4vnLkaksY2d-ZszC-t0';
 var SIM55 = '1Fwyln1_-ogHjvfnoQnI2tdXTWGRosThZofgjWU2TSl8';
 var M2MTP = '1m6AHs66KJ5RbvQUu5vvM0HGmNalMwElS7LBlk8yVEJA';
 
-// ══════════════════════════════════════════
-// Data store
-// ══════════════════════════════════════════
-var D = { dash:[], tvf1:[], tvf2:[], tvf4:[], tvf6:[], tvf7:[], tvf8:[], stock:[], sim55:[], track:[] };
-var simMap   = {};   // ICCID → MSISDN
-var sim55Map = {};   // MSISDN → { email, name, status, blocked }
-var stockMap = {};   // POS serial → { name, email, status }
-var curF = 'all';
+// ═══ Data store ═══
+var D = {dash:[], tvf1:[], tvf2:[], tvf4:[], tvf6:[], tvf7:[], tvf8:[], stock:[], track:[], sim55:[]};
+var simMap = {}, sim55Map = {}, stockMap = {};
 var openMap = {};
+var curFtr = '', lastIdx = {};
+var repFiltered = [];
 
-// ══════════════════════════════════════════
-// gviz
-// ══════════════════════════════════════════
+// ═══ Escape HTML ═══
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══ GViz loader ═══
 async function gviz(id, sheet) {
-  var url = 'https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json'
-          + (sheet ? '&sheet='+encodeURIComponent(sheet) : '');
-  var t = await (await fetch(url)).text();
-  var j = JSON.parse(t.replace(/^[^(]+\(/,'').replace(/\);\s*$/,''));
+  var url = 'https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json';
+  if (sheet) url += '&sheet=' + encodeURIComponent(sheet);
+  var r = await fetch(url);
+  var t = await r.text();
+  var j = JSON.parse(t.replace(/^[^(]+\(/,'').replace(/\);?\s*$/,''));
   var cols = (j.table.cols||[]).map(function(c){ return (c.label||c.id||'').trim(); });
   return (j.table.rows||[]).map(function(row){
-    var o={};
-    (row.c||[]).forEach(function(cell,i){ o[cols[i]] = (cell&&cell.v!=null)?String(cell.v).trim():''; });
+    var o = {};
+    (row.c||[]).forEach(function(cell,i){
+      o[cols[i]] = (cell&&cell.v!=null) ? String(cell.v).trim() : '';
+    });
     return o;
-  }).filter(function(o){ return Object.values(o).some(function(v){return v;}); });
+  }).filter(function(r){ return Object.values(r).some(function(v){return v&&v!=='#N/A';}); });
 }
 
-// ══════════════════════════════════════════
-// Dates
-// ══════════════════════════════════════════
-function pd(s) {
-  if (!s) return new Date(0);
-  s = String(s).replace(/[٠-٩]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-1632);})
-               .replace(/،/g,',');
-  var d = new Date(s); if (!isNaN(d)) return d;
-  var m = s.match(/(\d+)\/(\d+)\/(\d+)/);
-  if (m) {
-    var a=+m[1],b=+m[2],c=+m[3];
-    if (c>=2000) return new Date(c,b-1,a);      // DD/MM/YYYY
-    if (a>=2000) return new Date(a,b-1,c);      // YYYY/MM/DD
-  }
-  return new Date(0);
-}
-function fd(s) {
-  var d = pd(s); if (!d||d.getTime()===0) return s||'';
-  return d.toLocaleDateString('ar-IQ',{day:'numeric',month:'numeric',year:'numeric'});
-}
-
-// ══════════════════════════════════════════
-// SIM lookup
-// ══════════════════════════════════════════
+// ═══ SIM ICCID → MSISDN ═══
 function addSim(iccid, msisdn) {
   if (!iccid||!msisdn) return;
   var ic = String(iccid).replace(/\.0+$/,'').replace(/\s/g,'');
   var ms = String(msisdn).replace(/\.0+$/,'').replace(/\s/g,'');
-  if (ic.length<5||ms.length<5) return;
+  if (!ic||!ms) return;
   var s = ic.replace(/^0+/,'');
   [ic, s, '0'+s, '00'+s].forEach(function(k){ if(k) simMap[k]=ms; });
 }
 
-function resolveSim(raw) {
-  if (!raw) return {num:'',orig:''};
-  var c = String(raw).replace(/\.0+$/,'').replace(/\s/g,'').trim();
-  if (!c||c.length<4) return {num:raw,orig:''};
-  // Already MSISDN?
-  var ok = (c.startsWith('07')&&c.length===11) ||
-           (c.startsWith('9647')&&c.length>=12) ||
-           (c.startsWith('7')&&c.length<=10&&!c.startsWith('78')) ;
-  if (ok) return {num:c,orig:''};
+function toMSISDN(raw) {
+  var c = String(raw||'').replace(/\.0+$/,'').replace(/\s/g,'').trim();
+  if (!c||c.length<6) return c;
+  // Already MSISDN if starts with 07 or 7 or 9647 and short
+  if ((c.startsWith('07')||c.startsWith('7')||c.startsWith('9647')) && c.length<=13) return c;
+  // Try lookup
   var s = c.replace(/^0+/,'');
-  var found = simMap[c]||simMap[s]||simMap['0'+s]||simMap['00'+s];
-  if (found) return {num:found,orig:c};
-  return {num:c,orig:''};
+  return simMap[c]||simMap[s]||simMap['0'+s]||simMap['00'+s]||c;
 }
 
-// ══════════════════════════════════════════
-// Normalize for search
-// ══════════════════════════════════════════
-function norm(s) {
-  return String(s||'').replace(/[أإآا]/g,'ا').replace(/[ةه]/g,'ه')
-    .replace(/[يىئ]/g,'ي').replace(/\s+/g,' ').toLowerCase().trim();
+// ═══ Date parsing — handles all formats ═══
+function pd(s) {
+  if (!s||s==='#N/A') return new Date(0);
+  s = String(s).trim();
+  // Date(y,m,d) from gviz
+  var gm = s.match(/^Date\((\d+),(\d+),(\d+)/);
+  if (gm) return new Date(+gm[1], +gm[2], +gm[3]);
+  // Arabic digits
+  var ar = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+  s = s.replace(/[٠-٩]/g, function(d){return ar[d];}).replace(/\u200f|\u200e/g,'');
+  // Time part
+  var th=0, tm=0;
+  var tMatch = s.match(/(\d+):(\d+)/);
+  if (tMatch) { th=+tMatch[1]; tm=+tMatch[2]; }
+  if (s.includes('م')&&th<12) th+=12;
+  if (s.includes('ص')&&th===12) th=0;
+  // Try YYYY/MM/DD or YYYY-MM-DD
+  var m = s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if (m) return new Date(+m[1],+m[2]-1,+m[3],th,tm);
+  // Try DD/MM/YYYY or D/M/YYYY
+  m = s.match(/^(\d{1,2})[\/\\\-](\d{1,2})[\/\\\-](\d{4})/);
+  if (m) {
+    var d=+m[1], mo=+m[2], y=+m[3];
+    // MM/DD/YYYY if month>12 detected by first number
+    if (d>12) return new Date(y,mo-1,d,th,tm);
+    return new Date(y,mo-1,d,th,tm);
+  }
+  // Try MM/DD/YYYY American
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) {
+    var a=+m[1], b=+m[2], y=+m[3];
+    if (a>12) return new Date(y,b-1,a,th,tm); // DD/MM
+    return new Date(y,a-1,b,th,tm); // MM/DD (American)
+  }
+  return new Date(s) || new Date(0);
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ══════════════════════════════════════════
-// Badge
-// ══════════════════════════════════════════
-function bc(st){
-  if(st==='نشط'||st==='Active') return 'bn';
-  if(st==='جديد') return 'bj';
-  return 'bw';
+function fmtDate(s) {
+  var d = pd(s);
+  if (d.getTime()===0) return s||'—';
+  return d.toLocaleDateString('ar-IQ',{year:'numeric',month:'numeric',day:'numeric'});
 }
 
-// ══════════════════════════════════════════
-// Build combined restaurant index from ALL sheets
-// ══════════════════════════════════════════
+// ═══ Name normalization ═══
+var CHICKEN = /تشيكن|تشكين|تشكن|شكين|شيكن|شيكن|جكن|جكين|تشكيين|چكن|chiken|chicken/gi;
+var AREA_MAP = [
+  [/\bال?زيون[ةه]\b/gi,'زيونه'],
+  [/\bال?منصور\b|متصور/gi,'منصور'],
+  [/\bال?سيدي[ةه]\b/gi,'سيديه'],
+  [/\bال?عامري[ةه]\b/gi,'عامريه'],
+  [/\bال?جادري[ةه]\b|حادري[ةه]/gi,'جادريه'],
+  [/\bال?اعظمي[ةه]\b|اعضمي[ةه]/gi,'اعظميه'],
+  [/\bال?جامع[ةه]\b|حي\s*الجامع[ةه]/gi,'جامعه'],
+  [/\bال?كراد[ةه]\b|\b6[24]?\b|٦٢|٤٢|٥٢|\b\d{2}\b(?=\s*$)/gi,'كراده'],
+  [/شارع\s*فلسطين|ش\.?\s*فلسطين/gi,'فلسطين'],
+  [/\bال?جهاد\b/gi,'جهاد'],
+  [/\bال?شعب\b/gi,'شعب'],
+  [/\bال?كرخ\b/gi,'كرخ'],
+  [/\bال?بلديات\b/gi,'بلديات'],
+  [/\bال?غزالي[ةه]\b/gi,'غزاليه'],
+  [/\bال?يرموك\b/gi,'يرموك'],
+  [/\bال?زعفراني[ةه]\b/gi,'زعفرانيه'],
+  [/\bال?بنوك\b/gi,'بنوك'],
+  [/\bال?مشتل\b/gi,'مشتل'],
+  [/\bال?اعظميه?\b/gi,'اعظميه'],
+  [/حي\s*ال?/gi,''],
+];
+
+function normKey(name) {
+  var n = String(name||'').replace(/\s+/g,' ').trim().toLowerCase();
+  n = n.replace(CHICKEN,'جكن');
+  AREA_MAP.forEach(function(pair){ n=n.replace(pair[0],pair[1]); });
+  // Remove ال prefix from remaining words
+  n = n.replace(/\bال/g,'');
+  // Remove tashkeel
+  n = n.replace(/[\u064b-\u065f]/g,'');
+  // Normalize ta marbuta
+  n = n.replace(/ة\b/g,'ه');
+  return n.replace(/\s+/g,' ').trim();
+}
+
+// ═══ cv helper — get first non-empty field ═══
+function gv(r) {
+  return function() {
+    for (var i=0;i<arguments.length;i++) {
+      var v=r[arguments[i]];
+      if (v&&v.trim&&v.trim()&&v!=='#N/A') return v.trim();
+    }
+    return '';
+  };
+}
+
+// ═══ Tech normalization ═══
+var TECH_MAP = {
+  'علي مصطفى':'علي متولي',
+  'علي مصطفي':'علي متولي',
+  'ali mustafa':'علي متولي',
+};
+function normTech(t) { return TECH_MAP[t]||t; }
+
+// ═══ Build search index ═══
 function buildIndex() {
-  // key → { name, addr, recs:[] }
   var idx = {};
 
-  function addRec(name, addr, source, data) {
-    name = String(name||'').trim();
-    addr = String(addr||'').trim();
-    if (!name || name.length<2) return;
-    var k = norm(name)+'|'+norm(addr);
-    if (!idx[k]) idx[k] = {name:name, addr:addr, recs:[]};
-    idx[k].recs.push(Object.assign({_src:source, _name:name, _addr:addr}, data));
+  function addRec(name, rec, src) {
+    if (!name||name.length<2) return;
+    var k = normKey(name);
+    if (!idx[k]) idx[k] = {displayName:name, key:k, dash:[], tvf:[], tvfDev:[]};
+    if (src==='dash') idx[k].dash.push(rec);
+    else if (src==='tvf') idx[k].tvf.push(rec);
+    else if (src==='tvfDev') idx[k].tvfDev.push(rec);
+    // Update displayName to most recent
+    if (rec._src==='dash') idx[k].displayName = name;
   }
 
-  // ① Dashboard (ورقة1 + default) — richest data
-  D.dash.forEach(function(r){
-    var nm = r['اسم المطعم']||'';
-    var ad = r['العنوان']||r['العنوان ']||'';
-    var st = r['status']||r['Status']||'';
-    if (!nm||!('نشط جديد انتظار'.includes(st))) return;
-    addRec(nm, ad, 'dash', r);
-  });
+  D.dash.forEach(function(r){ r._src='dash'; addRec(r['اسم المطعم'],r,'dash'); });
 
-  // ② TVF Form Responses 2,4,6,7,8 (has restaurant name)
   [D.tvf2, D.tvf4, D.tvf6, D.tvf7, D.tvf8].forEach(function(arr){
     arr.forEach(function(r){
-      var nm = r['اسم المطعم']||r['rest name']||'';
-      var ad = r['الموقع']||r['العنوان']||'';
-      addRec(nm, ad, 'tvf2', r);
+      var name = r['اسم المطعم']||r['اسم الوظف']||r['restaurant']||'';
+      if (name) addRec(name, r, 'tvf');
     });
   });
 
-  // ③ TVF Form Responses 1 (no restaurant name, but has POS + SIM)
+  // TVF1 has device/sim but no restaurant name — link via device
   D.tvf1.forEach(function(r){
-    var pos = r['رقم الجهاز']||r['رقم الجهاز ']||'';
-    var sim = r['رقم السم كارت']||r['رقم السم كارت ']||'';
-    if (!pos||pos.length<4) return;
-    // Look up in stock map for name
-    var nm = (stockMap[pos]&&stockMap[pos].name) || ('جهاز: '+pos);
-    addRec(nm, '', 'tvf1', r);
+    var dev = (r['رقم الجهاز']||r['رقم الجهاز ']||'').trim().replace(/\.0+$/,'');
+    if (!dev) return;
+    // Find which restaurant this device belongs to
+    var nm = stockMap[dev]&&stockMap[dev].name ? stockMap[dev].name : '';
+    if (nm) addRec(nm, r, 'tvf');
   });
 
-  // ④ Sim55 — add restaurants that don't exist yet
-  D.sim55.forEach(function(r){
-    var nm = r['اسم المطعم']||'';
-    var ms = r['ارقام']||r['ارقام ']||'';
-    if (!nm||nm==='#N/A') return;
-    addRec(nm, '', 'sim55', r);
-  });
-
-  // Sort recs in each group newest-first
+  // Sort each group dash records newest first
   Object.values(idx).forEach(function(g){
-    g.recs.sort(function(a,b){
-      var da = pd(a['submittedAt']||a['Timestamp']||a['الطابع الزمني']||'');
-      var db = pd(b['submittedAt']||b['Timestamp']||b['الطابع الزمني']||'');
-      return db-da;
+    g.dash.sort(function(a,b){ return pd(b['submittedAt']||b['date']||'')-pd(a['submittedAt']||a['date']||''); });
+    g.tvf.sort(function(a,b){
+      var da = b['Timestamp']||b['كرل دايت']||b['التاريخ']||'';
+      var db = a['Timestamp']||a['كرل دايت']||a['التاريخ']||'';
+      return pd(da)-pd(db);
     });
   });
 
   return idx;
 }
 
-// ══════════════════════════════════════════
-// Get best values from a record (multi-key)
-// ══════════════════════════════════════════
-function cv(r){ return function(){ for(var i=0;i<arguments.length;i++){var v=r[arguments[i]];if(v&&v.trim()&&v!=='#N/A')return v.trim();} return ''; }; }
-
-// ══════════════════════════════════════════
-// Render search tab
-// ══════════════════════════════════════════
-var lastIdx = {};
-
-function doSearch() {
-  var q = norm(document.getElementById('q').value);
-  renderSearch(q);
+// ═══ Smart search score ═══
+function score(name, q) {
+  var n = normKey(name), qn = normKey(q);
+  if (!n||!qn) return 0;
+  if (n===qn) return 1;
+  if (n.includes(qn)||qn.includes(n)) return 0.92;
+  var qw = qn.split(' ').filter(function(w){return w.length>1;});
+  if (!qw.length) return 0;
+  var all = qw.every(function(w){return n.includes(w);});
+  if (all) return 0.88;
+  var mc = qw.filter(function(w){return n.includes(w);}).length;
+  if (mc===0) return 0;
+  if (qw.length>=2&&mc===1) return 0.3;
+  return 0.6*(mc/qw.length);
 }
 
-function setF(f, el) {
-  curF = f;
+// ═══ Filters ═══
+function setFtr(f, el) {
+  curFtr = f;
   document.querySelectorAll('.ftr').forEach(function(e){e.classList.remove('on');});
   el.classList.add('on');
   doSearch();
 }
 
-function renderSearch(q) {
+// ═══ Main search ═══
+function doSearch() {
+  var q = (document.getElementById('si').value||'').trim();
   var idx = lastIdx;
+  if (!Object.keys(idx).length) { document.getElementById('out').innerHTML='<div class="empty">⏳ جاري التحميل...</div>'; return; }
+
   var keys = Object.keys(idx);
 
-  // Filter by status/sim
-  if (curF !== 'all') {
-    keys = keys.filter(function(k){
-      var latest = idx[k].recs[0];
-      if (!latest) return false;
-      var get = cv(latest);
-      if (curF === '4G') return get('حالة SIM','حالة سيم') === '4G';
-      if (curF === 'غير فعال') return get('حالة SIM','حالة سيم') === 'غير فعال';
-      return get('status','Status') === curF;
-    });
+  // If query looks like device number
+  if (q && /^(v[bsenpth]|VB|VS|VE|VN|VP|VT|PE)\d*/i.test(q)) {
+    showDeviceSearch(q); return;
+  }
+  // If query looks like SIM
+  if (q && /^(07\d|7\d|964\d|\d{10,})/i.test(q.replace(/\s/g,''))) {
+    showSimSearch(q); return;
   }
 
-  // Filter by search
-  if (q) {
-    keys = keys.filter(function(k){
-      var g = idx[k];
-      var all = [];
-      g.recs.forEach(function(r){
-        var get = cv(r);
-        var simR = resolveSim(get('رقم SIM كارت POS','رقم السم كارت','SIM number','MSISDN','ارقام'));
-        all.push(g.name, g.addr,
-          get('رقم جهاز POS','رقم الجهاز','POS number','vs'),
-          simR.num, simR.orig,
-          get('اسم الموظف المسؤول','اسم الوظف','اسم الموظف'),
-          get('سبب الزيارة','سبب الزيارة/ توزيع','توزيع /راجاع','توزيع/راجع'),
-          get('ملاحظات','ملاحظة'),
-          get('الموقع','العنوان'),
-          r._src||'');
-      });
-      return norm(all.join(' ')).includes(q);
-    });
-  }
+  // Name search + filter
+  var results = [];
+  keys.forEach(function(k){
+    var g = idx[k];
+    var sc2 = q ? score(g.displayName, q) : 1;
+    if (sc2 < 0.28) return;
 
-  // Sort by most recent record
-  keys.sort(function(a,b){
-    var ra = idx[a].recs[0], rb = idx[b].recs[0];
-    var da = pd((ra&&(ra['submittedAt']||ra['Timestamp']||ra['الطابع الزمني']))||'');
-    var db = pd((rb&&(rb['submittedAt']||rb['Timestamp']||rb['الطابع الزمني']))||'');
+    // Apply status/sim filter
+    var latest = g.dash[0];
+    if (curFtr) {
+      if (curFtr==='4G') { if (!latest||latest['حالة SIM']!=='4G') return; }
+      else if (curFtr==='sim-off') { if (!latest||latest['حالة SIM']!=='غير فعال') return; }
+      else { if (!latest||latest['status']!==curFtr) return; }
+    }
+
+    results.push({g:g, sc:sc2, latest:latest});
+  });
+
+  // Sort: by score then by date
+  results.sort(function(a,b){
+    if (Math.abs(a.sc-b.sc)>0.05) return b.sc-a.sc;
+    var da = a.latest?pd(a.latest['submittedAt']||''):new Date(0);
+    var db = b.latest?pd(b.latest['submittedAt']||''):new Date(0);
     return db-da;
   });
 
-  // Stats (on ALL records before search filter)
-  var allDash = D.dash.filter(function(r){
-    var st=r['status']||''; return st==='نشط'||st==='جديد'||st==='انتظار';
+  // Stats
+  var tot=results.length, act=0, nw=0, wt=0;
+  results.forEach(function(r){
+    var st=r.latest?r.latest['status']||'':'';
+    if(st==='نشط')act++; if(st==='جديد')nw++; if(st==='انتظار')wt++;
   });
-  document.getElementById('s0').textContent = allDash.length;
-  document.getElementById('s1').textContent = allDash.filter(function(r){return r['status']==='نشط';}).length;
-  document.getElementById('s2').textContent = allDash.filter(function(r){return r['status']==='جديد';}).length;
-  document.getElementById('s3').textContent = allDash.filter(function(r){return r['status']==='انتظار';}).length;
-  document.getElementById('s4').textContent = allDash.filter(function(r){return r['حالة SIM']==='غير فعال';}).length;
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat"><div class="stat-n">'+tot+'</div><div class="stat-l">إجمالي</div></div>'+
+    '<div class="stat"><div class="stat-n" style="color:#4ade80">'+act+'</div><div class="stat-l">نشط</div></div>'+
+    '<div class="stat"><div class="stat-n" style="color:#93c5fd">'+nw+'</div><div class="stat-l">جديد</div></div>'+
+    '<div class="stat"><div class="stat-n" style="color:#fbbf24">'+wt+'</div><div class="stat-l">انتظار</div></div>';
 
-  if (!keys.length) {
-    document.getElementById('out').innerHTML = '<div class="empty">🔍 لا نتائج</div>';
+  if (!results.length) {
+    document.getElementById('out').innerHTML = '<div class="empty">🔍 لا نتائج لـ "'+esc(q)+'"<br><span style="font-size:12px;color:#1e3a5f">جرب جزء من الاسم</span></div>';
     return;
   }
 
   var html = '';
-  keys.slice(0,200).forEach(function(k){
-    var g = idx[k];
-    var latest = g.recs[0];
-    var get = cv(latest);
-    var st     = get('status','Status');
-    var pos    = get('رقم جهاز POS','رقم الجهاز','POS number');
-    var simRaw = get('رقم SIM كارت POS','رقم السم كارت','SIM number','MSISDN','ارقام');
-    var simR   = resolveSim(simRaw);
-    var tech   = get('اسم الموظف المسؤول','اسم الوظف','اسم الموظف');
-    var date   = fd(get('submittedAt','Timestamp','الطابع الزمني'));
-    var reason = get('سبب الزيارة','سبب الزيارة/ توزيع','توزيع /راجاع');
-    var simSt  = get('حالة SIM','حالة سيم');
-    var comp   = get('منافس','المنافسين');
-    var note   = get('ملاحظات','ملاحظة');
-    var posType= get('جهاز POS','نوع الجهاز');
-    var cc     = get('هل التاسك عن طريق الكول سنتر','هل التاسك عن طريق كول سنتر');
-    var maint  = get('صيانة POS','صيانة جهاز');
-    var lock   = get('قفل الاعدادات');
-    // sim55 info
-    var s55 = sim55Map[simR.num]||{};
-    var email  = get('email')||s55.email||'';
+  results.slice(0,120).forEach(function(item){
+    html += renderGroup(item.g, item.latest);
+  });
+  document.getElementById('out').innerHTML = html;
+}
 
-    // ── stock info
-    var stk = stockMap[pos]||{};
-    var stkSt = stk.status||'';
+// ═══ Render one restaurant group ═══
+function renderGroup(g, latest) {
+  var k = g.key;
+  var isOpen = openMap[k];
+  var name = g.displayName;
 
-    var id = 'c'+k.replace(/[^a-z0-9]/gi,'');
-    var isOpen = openMap[k];
+  var devRaw = latest ? latest['رقم جهاز POS']||latest['POS number']||'' : '';
+  var simRaw = latest ? latest['رقم SIM كارت POS']||latest['SIM number']||latest['رقم السيم']||'' : '';
+  var sim = toMSISDN(simRaw);
+  var status = latest ? latest['status']||'' : '';
+  var simSt = latest ? latest['حالة SIM']||'' : '';
+  var addr = latest ? latest['العنوان']||'' : '';
+  var tech = latest ? normTech(latest['اسم الموظف المسؤول']||latest['اسم الوظف']||'') : '';
+  var dateStr = latest ? fmtDate(latest['submittedAt']||latest['date']||'') : '';
+  var rival = latest ? latest['منافس']||latest['المنافسين']||'' : '';
+  var reason = latest ? latest['سبب الزيارة']||latest['سبب_الزيارة']||'' : '';
 
-    html += '<div class="card">';
-    // Header
-    html += '<div class="card-hd" onclick="tog(\''+k+'\')">';
-    html += '<div style="flex:1"><div class="cname">'+esc(g.name)+'</div>';
-    if (g.addr) html += '<div class="caddr">📍 '+esc(g.addr)+'</div>';
-    html += '</div>';
-    if (st) html += '<span class="bdg '+bc(st)+'">'+esc(st)+'</span>';
-    html += '</div>';
+  // sim55 info
+  var s5 = sim55Map[sim]||sim55Map[simRaw]||{};
+  var email = s5.email || (latest?latest['email']||latest['الايميل']||'':'') ||
+              (stockMap[devRaw]?stockMap[devRaw].email||'':'');
 
-    // Chips
-    html += '<div class="card-body">';
-    if (pos && pos!=='1'&&pos!=='2'&&pos!=='3'&&pos.length>3)
-      html += '<div class="chip pos">🖥️ '+esc(pos)+'</div>';
-    if (stkSt && pos && pos.length>4)
-      html += '<div class="chip '+(stkSt==='live'?'act':'')+'">📦 '+esc(stkSt)+'</div>';
-    if (simR.num && simR.num.length>4 && simR.num!=='78')
-      html += '<div class="chip sim">📶 '+esc(simR.num)+(simR.orig?'<span class="chip sim2"> ('+esc(simR.orig)+')</span>':'')+'</div>';
-    if (simSt)
-      html += '<div class="chip '+(simSt==='4G'?'act':simSt==='غير فعال'?'ina':'')+'">📡 '+esc(simSt)+'</div>';
-    if (email && email!=='#N/A')
-      html += '<div class="chip">✉️ '+esc(email)+'</div>';
-    if (date) html += '<div class="chip">📅 '+esc(date)+'</div>';
-    if (tech) html += '<div class="chip">👤 '+esc(tech)+'</div>';
-    if (reason&&reason.length>1) html += '<div class="chip">🔧 '+esc(reason)+'</div>';
-    if (posType&&posType.length>1&&posType!=='V2') html += '<div class="chip">🖨️ '+esc(posType)+'</div>';
-    if (maint&&maint.length>2) html += '<div class="chip">🔩 '+esc(maint)+'</div>';
-    if (lock&&lock.length>1) html += '<div class="chip">🔒 '+esc(lock)+'</div>';
-    if (cc&&cc==='نعم') html += '<div class="chip">📞 كول سنتر</div>';
-    if (comp&&comp.length>1&&comp!=='—') html += '<div class="chip">📱 '+esc(comp)+'</div>';
-    html += '</div>';
+  // Badges
+  var badges = '';
+  if (status==='نشط') badges+='<span class="bdg bdg-active">✅ نشط</span>';
+  else if (status==='جديد') badges+='<span class="bdg bdg-new">🆕 جديد</span>';
+  else if (status==='انتظار') badges+='<span class="bdg bdg-wait">⏳ انتظار</span>';
+  if (simSt==='4G') badges+='<span class="bdg bdg-4g">📡 4G</span>';
+  else if (simSt==='غير فعال') badges+='<span class="bdg bdg-off">🚫 سيم مقطوع</span>';
+  else if (simSt==='3G') badges+='<span class="bdg" style="background:#1c1a02;border:1px solid #713f12;color:#fbbf24">📶 3G</span>';
+  if (devRaw&&devRaw.length>3) badges+='<span class="bdg bdg-dev">🖥️ '+esc(devRaw)+'</span>';
+  if (g.dash.length>1) badges+='<span class="bdg" style="background:#0f1117;border:1px solid #334155;color:#475569">'+g.dash.length+' تاسك</span>';
 
-    if (note&&note.length>2)
-      html += '<div class="note-txt">📝 '+esc(note)+'</div>';
+  var html = '<div class="rest-card">';
+  html += '<div class="rc-head" onclick="tog(\''+k+'\')">';
+  html += '<div style="flex:1">';
+  html += '<div class="rc-name">🏪 '+esc(name)+'</div>';
+  html += '<div class="rc-meta">';
+  if (addr) html += '📍 '+esc(addr)+' · ';
+  if (tech) html += '👤 '+esc(tech)+' · ';
+  if (dateStr) html += '📅 '+esc(dateStr);
+  if (reason) html += '<br>🔧 '+esc(reason);
+  html += '</div>';
+  html += '<div class="rc-badges">'+badges+'</div>';
+  html += '</div>';
+  html += '<div class="rc-arrow">'+(isOpen?'▲':'▼')+'</div>';
+  html += '</div>';
 
-    // History toggle
-    if (g.recs.length > 1) {
-      html += '<button class="tog" onclick="tog(\''+k+'\')">'+
-              (isOpen?'▲':'▼')+' '+g.recs.length+' سجل</button>';
-      html += '<div class="hist'+(isOpen?' open':'')+'">';
-      g.recs.slice(1).forEach(function(rec){
-        var rget = cv(rec);
-        var rSt  = rget('status','Status');
-        var rPos = rget('رقم جهاز POS','رقم الجهاز','POS number');
-        var rSim = resolveSim(rget('رقم SIM كارت POS','رقم السم كارت','SIM number','ارقام'));
-        var rDt  = fd(rget('submittedAt','Timestamp','الطابع الزمني'));
-        var rTch = rget('اسم الموظف المسؤول','اسم الوظف','اسم الموظف');
-        var rRs  = rget('سبب الزيارة','سبب الزيارة/ توزيع','توزيع /راجاع');
-        var rNt  = rget('ملاحظات','ملاحظة');
-        var src  = rec._src||'';
-        html += '<div class="hi">';
-        html += '<div class="hi-row">';
-        if (rSt) html += '<span class="bdg '+bc(rSt)+'" style="font-size:10px">'+esc(rSt)+'</span>';
-        html += '<span class="hi-d">'+esc(rDt)+'</span>';
-        html += '<span class="hi-t">'+esc(rTch)+'</span>';
-        html += '<span class="hi-d" style="color:#374151;font-size:9px">['+esc(src)+']</span>';
-        html += '</div>';
-        if (rPos&&rPos.length>3&&rPos!=='1'&&rPos!=='2')
-          html += '<div class="hi-row"><span class="chip pos" style="font-size:10px">🖥️ '+esc(rPos)+'</span>';
-        if (rSim.num&&rSim.num.length>4)
-          html += '<span class="chip sim" style="font-size:10px">📶 '+esc(rSim.num)+'</span>';
-        html += '</div>';
-        if (rRs&&rRs.length>1) html += '<div class="hi-r">🔧 '+esc(rRs)+'</div>';
-        if (rNt&&rNt.length>2) html += '<div class="hi-n">📝 '+esc(rNt)+'</div>';
+  if (isOpen) {
+    html += '<div class="rc-detail open">';
+
+    // All dashboard tasks
+    g.dash.forEach(function(r, i){
+      var v = gv(r);
+      var dev2 = v('رقم جهاز POS','POS number','رقم الجهاز');
+      var sim2 = toMSISDN(v('رقم SIM كارت POS','SIM number','رقم السيم'));
+      var dt = fmtDate(v('submittedAt','date','Timestamp'));
+      var tc = normTech(v('اسم الموظف المسؤول','اسم الوظف'));
+      var st = v('status');
+      var rs = v('سبب الزيارة');
+      var simst2 = v('حالة SIM');
+      var maint = v('صيانة POS');
+      var lock = v('قفل الاعدادات');
+      var rvl = v('منافس','المنافسين');
+      var callc = v('هل التاسك عن طريق الكول سنتر');
+      var notes = v('ملاحظات','ملاحظة');
+      var posType = v('جهاز POS');
+      var addr2 = v('العنوان');
+      var em = v('email','الايميل');
+
+      var stCls = st==='نشط'?'bdg-active':st==='جديد'?'bdg-new':st==='انتظار'?'bdg-wait':'';
+      html += '<div class="task-item'+(i===0?' task-latest':'')+'">';
+      html += '<div class="task-hdr">';
+      html += '<span class="task-date">📅 '+esc(dt)+'</span>';
+      if (tc) html += '<span class="task-tech">👤 '+esc(tc)+'</span>';
+      if (rs) html += '<span class="task-reason">🔧 '+esc(rs)+'</span>';
+      if (st) html += '<span class="bdg '+stCls+'" style="padding:1px 7px;font-size:10px">'+esc(st)+'</span>';
+      if (i===0) html += '<span style="font-size:10px;color:#3b82f6;margin-right:auto">⚡ آخر تاسك</span>';
+      html += '</div>';
+
+      html += '<div class="task-grid">';
+      if (dev2) html += '<div class="task-field"><div class="tf-lbl">🖥️ رقم الجهاز</div><div class="tf-val hi">'+esc(dev2)+'</div></div>';
+      if (sim2) html += '<div class="task-field"><div class="tf-lbl">📶 رقم السيم</div><div class="tf-val sim">'+esc(sim2)+'</div></div>';
+      if (simst2) html += '<div class="task-field"><div class="tf-lbl">📡 حالة السيم</div><div class="tf-val '+(simst2==='4G'?'grn':simst2==='غير فعال'?'red':'')+'">'+esc(simst2)+'</div></div>';
+      if (posType) html += '<div class="task-field"><div class="tf-lbl">🖨️ نوع الجهاز</div><div class="tf-val">'+esc(posType)+'</div></div>';
+      if (maint) html += '<div class="task-field"><div class="tf-lbl">🔩 الصيانة</div><div class="tf-val">'+esc(maint)+'</div></div>';
+      if (lock) html += '<div class="task-field"><div class="tf-lbl">🔒 قفل الإعدادات</div><div class="tf-val">'+esc(lock)+'</div></div>';
+      if (rvl) html += '<div class="task-field task-full"><div class="tf-lbl">📱 التطبيقات المنافسة</div><div class="tf-val">'+esc(rvl)+'</div></div>';
+      if (callc) html += '<div class="task-field"><div class="tf-lbl">📞 كول سنتر</div><div class="tf-val">'+esc(callc)+'</div></div>';
+      if (addr2) html += '<div class="task-field task-full"><div class="tf-lbl">📍 العنوان</div><div class="tf-val">'+esc(addr2)+'</div></div>';
+      if (em) html += '<div class="task-field task-full"><div class="tf-lbl">✉️ الإيميل</div><div class="tf-val">'+esc(em)+'</div></div>';
+      html += '</div>';
+      if (notes&&notes.trim()) html += '<div class="task-notes">📝 '+esc(notes)+'</div>';
+      html += '</div>';
+    });
+
+    // TVF records
+    if (g.tvf.length) {
+      html += '<div class="tvf-section">';
+      html += '<div class="tvf-hdr">📋 Technical Visit Form ('+g.tvf.length+' سجل)</div>';
+      g.tvf.slice(0,5).forEach(function(r){
+        var v = gv(r);
+        var dt2 = fmtDate(v('Timestamp','كرل دايت','التاريخ'));
+        var tc2 = normTech(v('اسم الموظف المسؤول','اسم الوظف','اسم الموظف'));
+        var op = v('توزيع /راجاع','نوع العملية','توزيع/راجاع');
+        var dev3 = v('رقم الجهاز','POS number');
+        var sim3 = toMSISDN(v('رقم السيم كارت','SIM number','رقم السم كارت'));
+        var nt = v('ملاحظة','ملاحظات');
+        html += '<div class="tvf-item">';
+        html += '📅 '+esc(dt2);
+        if (tc2) html += ' · 👤 '+esc(tc2);
+        if (op) html += ' · '+esc(op);
+        if (dev3) html += '<br>🖥️ '+esc(dev3);
+        if (sim3) html += ' · 📶 '+esc(sim3);
+        if (nt) html += '<br>📝 '+esc(nt);
         html += '</div>';
       });
+      if (g.tvf.length>5) html += '<div style="font-size:10px;color:#475569;padding:4px 8px">... و '+(g.tvf.length-5)+' سجل آخر</div>';
       html += '</div>';
     }
 
-    html += '</div>';
+    html += '</div>'; // rc-detail
+  }
+  html += '</div>'; // rest-card
+  return html;
+}
+
+// ═══ Device search ═══
+function showDeviceSearch(q) {
+  var ql = q.toLowerCase().replace(/\s/g,'');
+  var results = [];
+  D.dash.forEach(function(r){
+    var dev = (r['رقم جهاز POS']||'').toLowerCase().replace(/\s/g,'');
+    if (dev && dev.includes(ql)) results.push({r:r, src:'dash'});
+  });
+  D.tvf1.forEach(function(r){
+    var dev = (r['رقم الجهاز']||r['رقم الجهاز ']||'').toLowerCase().replace(/\s/g,'');
+    if (dev && dev.includes(ql)) results.push({r:r, src:'tvf1'});
+  });
+  D.track.forEach(function(r){
+    var dev = (r['vs']||r['VS']||'').toLowerCase().replace(/\s/g,'');
+    if (dev && dev.includes(ql)) results.push({r:r, src:'track'});
   });
 
+  results.sort(function(a,b){
+    var da = a.src==='dash'?pd(a.r['submittedAt']||''):a.src==='tvf1'?pd(a.r['Timestamp']||''):pd(a.r['date']||'');
+    var db = b.src==='dash'?pd(b.r['submittedAt']||''):b.src==='tvf1'?pd(b.r['Timestamp']||''):pd(b.r['date']||'');
+    return db-da;
+  });
+
+  document.getElementById('statsBar').innerHTML = '<div class="stat"><div class="stat-n">'+results.length+'</div><div class="stat-l">نتيجة</div></div>';
+
+  if (!results.length) { document.getElementById('out').innerHTML='<div class="empty">لا نتائج لجهاز "'+esc(q)+'"</div>'; return; }
+
+  var html = '';
+  results.slice(0,50).forEach(function(item){
+    var r = item.r;
+    var v = gv(r);
+    var dev = v('رقم جهاز POS','vs','VS','رقم الجهاز');
+    var sim = toMSISDN(v('رقم SIM كارت POS','رقم السيم','msid','MSISDN'));
+    var name = v('اسم المطعم','rest name','REST NAME');
+    var dt = fmtDate(v('submittedAt','date','Timestamp'));
+    var tc = normTech(v('اسم الموظف المسؤول','اسم الوظف','team'));
+    var ret = v('return','توزيع /راجاع');
+    html += '<div class="rest-card"><div class="rc-head" style="cursor:default">';
+    html += '<div style="flex:1">';
+    html += '<div class="rc-name">🖥️ '+esc(dev)+'</div>';
+    html += '<div class="rc-meta">';
+    if (name) html += '🏪 '+esc(name)+' · ';
+    if (tc) html += '👤 '+esc(tc)+' · ';
+    html += '📅 '+esc(dt);
+    if (ret) html += ' · 🔄 '+esc(ret);
+    if (sim) html += '<br>📶 '+esc(sim);
+    html += '</div></div></div></div>';
+  });
+  document.getElementById('out').innerHTML = html;
+}
+
+// ═══ SIM search ═══
+function showSimSearch(q) {
+  var ms = toMSISDN(q.replace(/\s/g,''));
+  var results = [];
+  D.dash.forEach(function(r){
+    var s = toMSISDN(r['رقم SIM كارت POS']||'');
+    if (s===ms||s===q.replace(/\s/g,'')) results.push(r);
+  });
+  document.getElementById('statsBar').innerHTML = '<div class="stat"><div class="stat-n">'+results.length+'</div><div class="stat-l">نتيجة</div></div>';
+  if (!results.length) { document.getElementById('out').innerHTML='<div class="empty">لا نتائج لرقم السيم "'+esc(q)+'"</div>'; return; }
+  var s5 = sim55Map[ms]||{};
+  var html = '';
+  if (s5.name) html += '<div style="padding:10px 16px;font-size:12px;color:#94a3b8">📡 sim55: '+esc(s5.name)+' — '+esc(s5.status||'')+'</div>';
+  results.sort(function(a,b){return pd(b['submittedAt']||'')-pd(a['submittedAt']||'');});
+  results.slice(0,30).forEach(function(r){
+    var v=gv(r);
+    html += '<div class="rest-card"><div class="rc-head" style="cursor:default"><div style="flex:1">';
+    html += '<div class="rc-name">🏪 '+esc(v('اسم المطعم'))+'</div>';
+    html += '<div class="rc-meta">📅 '+esc(fmtDate(v('submittedAt')))+' · 👤 '+esc(normTech(v('اسم الموظف المسؤول','اسم الوظف')));
+    html += '<br>🖥️ '+esc(v('رقم جهاز POS'))+'</div></div></div></div>';
+  });
   document.getElementById('out').innerHTML = html;
 }
 
 function tog(k) { openMap[k]=!openMap[k]; doSearch(); }
 
-// ══════════════════════════════════════════
-// Reports tab
-// ══════════════════════════════════════════
-function renderReport() {
-  var techMap = {};
+// ═══ Reports ═══
+function populateReportDropdowns() {
+  var techs = {}, reasons = {};
   D.dash.forEach(function(r){
-    var t = r['اسم الموظف المسؤول']||r['اسم الوظف']||'';
-    if (!t) return;
-    if (!techMap[t]) techMap[t] = {total:0, active:0, new:0, wait:0};
-    techMap[t].total++;
-    var st = r['status']||'';
-    if (st==='نشط') techMap[t].active++;
-    if (st==='جديد') techMap[t].new++;
-    if (st==='انتظار') techMap[t].wait++;
+    var t=normTech(r['اسم الموظف المسؤول']||r['اسم الوظف']||'');
+    var rs=r['سبب الزيارة']||'';
+    if(t) techs[t]=(techs[t]||0)+1;
+    if(rs&&rs.length>1) reasons[rs]=(reasons[rs]||0)+1;
+  });
+  var tSel = document.getElementById('rTech');
+  Object.keys(techs).sort().forEach(function(t){
+    var o=document.createElement('option'); o.value=t; o.textContent=t+' ('+techs[t]+')'; tSel.appendChild(o);
+  });
+  var rSel = document.getElementById('rReason');
+  Object.keys(reasons).sort(function(a,b){return reasons[b]-reasons[a];}).slice(0,20).forEach(function(rs){
+    var o=document.createElement('option'); o.value=rs; o.textContent=rs; rSel.appendChild(o);
+  });
+}
+
+function getRepFiltered() {
+  var tech = document.getElementById('rTech').value;
+  var fromV = document.getElementById('rFrom').value;
+  var toV = document.getElementById('rTo').value;
+  var reason = document.getElementById('rReason').value;
+  var status = document.getElementById('rStatus').value;
+  var fromD = fromV ? new Date(fromV) : null;
+  var toD = toV ? new Date(toV+'T23:59:59') : null;
+
+  return D.dash.filter(function(r){
+    var t = normTech(r['اسم الموظف المسؤول']||r['اسم الوظف']||'');
+    if (tech && t!==tech) return false;
+    var d = pd(r['submittedAt']||r['date']||'');
+    if (fromD && d < fromD) return false;
+    if (toD && d > toD) return false;
+    if (reason && (r['سبب الزيارة']||'')!==reason) return false;
+    if (status && (r['status']||'')!==status) return false;
+    return true;
+  }).sort(function(a,b){ return pd(b['submittedAt']||'')-pd(a['submittedAt']||''); });
+}
+
+function renderReport() {
+  repFiltered = getRepFiltered();
+  var html = '';
+
+  // Summary stats
+  var tot=repFiltered.length, act=0, nw=0, wt=0, sg4=0, sgOff=0;
+  var techCount={};
+  repFiltered.forEach(function(r){
+    var st=r['status']||'';
+    if(st==='نشط')act++; if(st==='جديد')nw++; if(st==='انتظار')wt++;
+    var ss=r['حالة SIM']||'';
+    if(ss==='4G')sg4++; if(ss==='غير فعال')sgOff++;
+    var tc=normTech(r['اسم الموظف المسؤول']||r['اسم الوظف']||'');
+    if(tc) techCount[tc]=(techCount[tc]||0)+1;
   });
 
-  var html = '<h3 style="font-size:13px;color:#64748b;margin-bottom:10px;padding:4px 0">📊 تقرير الفنيين</h3>';
-  Object.keys(techMap).sort(function(a,b){return techMap[b].total-techMap[a].total;}).forEach(function(t){
-    var m = techMap[t];
-    html += '<div class="rep-card">';
-    html += '<div class="rep-name">👤 '+esc(t)+'</div>';
-    html += '<div class="rep-row"><span>إجمالي التاسكات</span><span class="rep-val">'+m.total+'</span></div>';
-    html += '<div class="rep-row"><span>✅ نشط</span><span class="rep-val" style="color:#22c55e">'+m.active+'</span></div>';
-    html += '<div class="rep-row"><span>🆕 جديد</span><span class="rep-val" style="color:#60a5fa">'+m.new+'</span></div>';
-    html += '<div class="rep-row"><span>⏳ انتظار</span><span class="rep-val" style="color:#fbbf24">'+m.wait+'</span></div>';
+  html += '<div class="rep-section"><h3>📊 ملخص النتائج</h3>';
+  html += '<div class="rep-card">';
+  html += '<div class="rep-stat-row"><span>إجمالي التاسكات</span><span class="rep-val">'+tot+'</span></div>';
+  html += '<div class="rep-stat-row"><span>✅ نشط</span><span class="rep-val" style="color:#4ade80">'+act+'</span></div>';
+  html += '<div class="rep-stat-row"><span>🆕 جديد</span><span class="rep-val" style="color:#93c5fd">'+nw+'</span></div>';
+  html += '<div class="rep-stat-row"><span>⏳ انتظار</span><span class="rep-val" style="color:#fbbf24">'+wt+'</span></div>';
+  html += '<div class="rep-stat-row"><span>📡 سيم 4G</span><span class="rep-val" style="color:#6ee7b7">'+sg4+'</span></div>';
+  html += '<div class="rep-stat-row"><span>🚫 سيم مقطوع</span><span class="rep-val" style="color:#f87171">'+sgOff+'</span></div>';
+  html += '</div></div>';
+
+  // Per technician
+  html += '<div class="rep-section"><h3>👤 تفصيل الفنيين</h3>';
+  Object.keys(techCount).sort(function(a,b){return techCount[b]-techCount[a];}).forEach(function(t){
+    var m = techCount[t];
+    html += '<div class="rep-card"><div class="rep-name">👤 '+esc(t)+'</div>';
+    html += '<div class="rep-stat-row"><span>عدد التاسكات</span><span class="rep-val">'+m+'</span></div>';
     html += '</div>';
   });
-
-  // SIM status summary
-  var sim4g=0, simInactive=0, sim3g=0;
-  D.dash.forEach(function(r){
-    var s=r['حالة SIM']||'';
-    if(s==='4G') sim4g++;
-    if(s==='غير فعال') simInactive++;
-    if(s==='3G') sim3g++;
-  });
-  html += '<h3 style="font-size:13px;color:#64748b;margin-bottom:10px;padding:8px 0 4px">📡 حالة السيم كارت</h3>';
-  html += '<div class="rep-card">';
-  html += '<div class="rep-row"><span>📡 4G</span><span class="rep-val" style="color:#22c55e">'+sim4g+'</span></div>';
-  html += '<div class="rep-row"><span>📶 3G</span><span class="rep-val" style="color:#fbbf24">'+sim3g+'</span></div>';
-  html += '<div class="rep-row"><span>🚫 غير فعال</span><span class="rep-val" style="color:#f87171">'+simInactive+'</span></div>';
   html += '</div>';
 
-  // Reason summary
-  var rsMap={};
-  D.dash.forEach(function(r){var rs=r['سبب الزيارة']||'';if(rs&&rs.length>1){rsMap[rs]=(rsMap[rs]||0)+1;}});
-  html += '<h3 style="font-size:13px;color:#64748b;margin-bottom:10px;padding:8px 0 4px">🔧 أسباب الزيارة</h3>';
-  html += '<div class="rep-card">';
-  Object.keys(rsMap).sort(function(a,b){return rsMap[b]-rsMap[a];}).slice(0,10).forEach(function(rs){
-    html += '<div class="rep-row"><span>'+esc(rs)+'</span><span class="rep-val">'+rsMap[rs]+'</span></div>';
+  // Task list
+  html += '<div class="rep-section"><h3>📋 قائمة التاسكات ('+tot+')</h3>';
+  repFiltered.slice(0,200).forEach(function(r){
+    var v=gv(r);
+    var dt=fmtDate(v('submittedAt','date'));
+    var tc=normTech(v('اسم الموظف المسؤول','اسم الوظف'));
+    var nm=v('اسم المطعم');
+    var st=v('status');
+    var rs=v('سبب الزيارة');
+    var dev=v('رقم جهاز POS');
+    var sim=toMSISDN(v('رقم SIM كارت POS','رقم السيم'));
+    var notes=v('ملاحظات','ملاحظة');
+    var stCls=st==='نشط'?'bdg-active':st==='جديد'?'bdg-new':st==='انتظار'?'bdg-wait':'';
+    html += '<div class="task-row">';
+    html += '<div class="task-row-hdr">';
+    html += '<span style="color:#60a5fa;font-size:11px">📅 '+esc(dt)+'</span>';
+    html += '<span style="color:#e2e8f0;font-weight:600">🏪 '+esc(nm)+'</span>';
+    if(tc) html += '<span style="color:#94a3b8">👤 '+esc(tc)+'</span>';
+    if(st) html += '<span class="bdg '+stCls+'" style="font-size:10px;padding:1px 6px">'+esc(st)+'</span>';
+    html += '</div>';
+    if(rs||dev||sim) {
+      html += '<div style="margin-top:4px;font-size:11px;color:#475569">';
+      if(rs) html += '🔧 '+esc(rs)+' ';
+      if(dev) html += '🖥️ '+esc(dev)+' ';
+      if(sim) html += '📶 '+esc(sim);
+      html += '</div>';
+    }
+    if(notes&&notes.trim()) html += '<div style="margin-top:3px;font-size:10px;color:#334155">📝 '+esc(notes)+'</div>';
+    html += '</div>';
   });
+  if (tot>200) html += '<div style="padding:10px;font-size:11px;color:#475569;text-align:center">... و '+(tot-200)+' تاسك آخر — استخدم CSV للتصدير الكامل</div>';
   html += '</div>';
 
   document.getElementById('repOut').innerHTML = html;
 }
 
-// ══════════════════════════════════════════
-// Tab switch
-// ══════════════════════════════════════════
+function resetReport() {
+  document.getElementById('rTech').value='';
+  document.getElementById('rFrom').value='';
+  document.getElementById('rTo').value='';
+  document.getElementById('rReason').value='';
+  document.getElementById('rStatus').value='';
+  renderReport();
+}
+
+function exportCSV() {
+  var rows = repFiltered.length ? repFiltered : D.dash;
+  var headers = ['التاريخ','اسم المطعم','الفني','الحالة','رقم الجهاز','رقم السيم','سبب الزيارة','حالة السيم','الملاحظات','العنوان'];
+  var csv = headers.join(',') + '\n';
+  rows.forEach(function(r){
+    var v=gv(r);
+    var row = [
+      fmtDate(v('submittedAt','date')),
+      v('اسم المطعم'),
+      normTech(v('اسم الموظف المسؤول','اسم الوظف')),
+      v('status'),
+      v('رقم جهاز POS'),
+      toMSISDN(v('رقم SIM كارت POS','رقم السيم')),
+      v('سبب الزيارة'),
+      v('حالة SIM'),
+      v('ملاحظات','ملاحظة'),
+      v('العنوان')
+    ].map(function(s){ return '"'+(s||'').replace(/"/g,'""')+'"'; });
+    csv += row.join(',') + '\n';
+  });
+  var blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pos-report-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+// ═══ Tab switch ═══
 function switchTab(tab, el) {
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
   el.classList.add('on');
@@ -549,17 +839,16 @@ function switchTab(tab, el) {
   if (tab==='report') renderReport();
 }
 
-// ══════════════════════════════════════════
-// Load all
-// ══════════════════════════════════════════
+// ═══ Load all sheets ═══
 async function loadAll() {
   var dot = document.getElementById('dot');
   var stxt = document.getElementById('stxt');
 
   try {
+    stxt.textContent = 'جاري تحميل الشيتات...';
     var _r = await Promise.all([
-      gviz(DASH).catch(function(){return [];}),
-      gviz(DASH,'ورقة1').catch(function(){return [];}),
+      gviz(DASH).catch(function(e){console.warn('dash1',e);return [];}),
+      gviz(DASH,'ورقة1').catch(function(e){console.warn('dash2',e);return [];}),
       gviz(TVF,'Form Responses 1').catch(function(){return [];}),
       gviz(TVF,'Form Responses 2').catch(function(){return [];}),
       gviz(TVF,'Form Responses 4').catch(function(){return [];}),
@@ -572,74 +861,76 @@ async function loadAll() {
       gviz(M2MTP,'Sheet1').catch(function(){return [];}),
       gviz(M2MTP,'الورقة1').catch(function(){return [];})
     ]);
+
     var dash1=_r[0], dash2=_r[1],
         tvf1=_r[2], tvf2=_r[3], tvf4=_r[4], tvf6=_r[5], tvf7=_r[6], tvf8=_r[7],
         stock=_r[8], trackRaw=_r[9],
-        sim55Raw=_r[10],
-        m1=_r[11], m2=_r[12];
+        sim55Raw=_r[10], m1=_r[11], m2=_r[12];
 
-    // ① Build SIM map (M2MTP: ICCID→MSISDN)
+    // Build M2MTP map
     m1.concat(m2).forEach(function(r){
       var keys = Object.keys(r);
       var iccid = r['ICCID']||r[keys[0]]||'';
-      var msisdn= r['MSISDN']||r[keys[1]]||'';
+      var msisdn = r['MSISDN']||r[keys[1]]||'';
       addSim(iccid, msisdn);
     });
 
-    // ② Build sim55 map (MSISDN→info)
+    // Build sim55 map
     sim55Raw.forEach(function(r){
-      var ms = (r['ارقام']||r['ارقام ']||'').trim().replace(/\.0+$/,'');
+      var ms = String(r['ارقام']||r['ارقام ']||'').replace(/\.0+$/,'').replace(/\s/g,'').trim();
       if (ms && ms!=='#N/A' && ms.length>4) {
         sim55Map[ms] = {
-          email: r['انك']||r['email']||'',
-          name:  r['اسم المطعم']||'',
-          status:r['الحالة']||r['فعال']||'',
+          email:   r['الايميل']||r['email']||'',
+          name:    r['اسم المطعم']||'',
+          status:  r['الحالة']||'',
           blocked: r['بلوك']||''
         };
       }
     });
 
-    // ③ Build stock map (POS serial→info)
+    // Build stock map
     stock.forEach(function(r){
-      var vs = (r['vs']||r['VS']||'').trim().replace(/\.0+$/,'');
+      var vs = String(r['vs']||r['VS']||'').replace(/\.0+$/,'').trim();
       if (vs && vs.length>3) {
         stockMap[vs] = {
-          name:  r['rest name']||r['اسم المطعم']||'',
-          email: r['email']||'',
-          status:r['status']||r['Status']||''
+          name:   r['rest name']||r['REST NAME']||'',
+          email:  r['email']||r['EMAIL']||'',
+          status: r['status']||r['Status']||''
         };
       }
     });
 
-    // ④ Store all arrays
-    // Merge dash: filter valid records only
+    // Merge dash — filter and deduplicate
     var allDash = dash1.concat(dash2).filter(function(r){
       var nm = r['اسم المطعم']||'';
-      var st = r['status']||'';
-      return nm.length>1 && (st==='نشط'||st==='جديد'||st==='انتظار');
+      return nm.length>1;
     });
-    // Deduplicate by id
-    var seen={};
+    var seen = {};
     D.dash = allDash.filter(function(r){
-      var id=r['id']||(r['اسم المطعم']+'|'+r['submittedAt']);
-      if(seen[id]) return false; seen[id]=true; return true;
+      var id = r['id']||(r['اسم المطعم']+'|'+r['submittedAt']);
+      if (seen[id]) return false; seen[id]=true; return true;
     });
 
-    D.tvf1 = tvf1; D.tvf2 = tvf2; D.tvf4 = tvf4;
-    D.tvf6 = tvf6; D.tvf7 = tvf7; D.tvf8 = tvf8;
-    D.stock = stock; D.track = trackRaw; D.sim55 = sim55Raw;
+    D.tvf1=tvf1; D.tvf2=tvf2; D.tvf4=tvf4;
+    D.tvf6=tvf6; D.tvf7=tvf7; D.tvf8=tvf8;
+    D.stock=stock; D.track=trackRaw; D.sim55=sim55Raw;
 
-    // ⑤ Build search index
+    // Build index
     lastIdx = buildIndex();
 
+    // Populate report dropdowns
+    populateReportDropdowns();
+
     dot.style.background = '#22c55e';
+    dot.style.animation = 'none';
     stxt.textContent = D.dash.length+' تاسك · '+Object.keys(lastIdx).length+' مطعم';
 
     doSearch();
   } catch(e) {
     dot.style.background = '#ef4444';
-    stxt.textContent = 'خطأ!';
+    stxt.textContent = 'خطأ في التحميل!';
     document.getElementById('out').innerHTML = '<div class="empty">❌ '+esc(e.message)+'</div>';
+    console.error(e);
   }
 }
 
@@ -647,4 +938,3 @@ loadAll();
 </script>
 </body>
 </html>
-
