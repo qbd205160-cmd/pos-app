@@ -785,9 +785,21 @@ function doRep(){
   _repData=rows;
   var s={total:rows.length,n:0,w:0,j:0};
   var techCount={};
+  var techDays={};  // فني → Set of date strings
   rows.forEach(function(r){
     if(r.status==='نشط')s.n++;else if(r.status==='انتظار')s.w++;else if(r.status==='جديد')s.j++;
-    if(r.tech){techCount[r.tech]=(techCount[r.tech]||0)+1;}
+    if(r.tech){
+      techCount[r.tech]=(techCount[r.tech]||0)+1;
+      // حساب الأيام: نأخذ فقط جزء التاريخ بدون الوقت
+      if(r.date){
+        var d=pd(r.date);
+        if(d&&d.getTime()>0){
+          var dayKey=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+          if(!techDays[r.tech]) techDays[r.tech]=[];
+          if(techDays[r.tech].indexOf(dayKey)<0) techDays[r.tech].push(dayKey);
+        }
+      }
+    }
   });
 
   // إحصاءات عامة
@@ -804,9 +816,20 @@ function doRep(){
     statsHtml+='<div style="font-size:11px;color:#475569;margin-bottom:8px">👤 تاسكات كل فني'+(fr?' | من '+fr:'')+(to?' إلى '+to:'')+'</div>';
     statsHtml+='<div style="display:flex;flex-wrap:wrap;gap:7px">';
     techList.forEach(function(tech){
-      statsHtml+='<div style="background:#060a12;border:1px solid #1e293b;border-radius:8px;padding:7px 12px;text-align:center">'
-        +'<div style="font-size:14px;font-weight:900;color:#60a5fa">'+techCount[tech]+'</div>'
-        +'<div style="font-size:10px;color:#475569;margin-top:2px">'+tech+'</div></div>';
+      var days = techDays[tech] ? techDays[tech].length : 0;
+      statsHtml+='<div style="background:#060a12;border:1px solid #1e293b;border-radius:8px;padding:7px 12px;text-align:center;min-width:90px">'
+        +'<div style="font-size:10px;color:#475569;margin-bottom:4px">'+tech+'</div>'
+        +'<div style="display:flex;gap:10px;justify-content:center;align-items:flex-end">'
+        +'<div style="text-align:center">'
+        +'<div style="font-size:18px;font-weight:900;color:#60a5fa">'+techCount[tech]+'</div>'
+        +'<div style="font-size:9px;color:#475569">تاسك</div>'
+        +'</div>'
+        +'<div style="text-align:center">'
+        +'<div style="font-size:18px;font-weight:900;color:#34d399">'+days+'</div>'
+        +'<div style="font-size:9px;color:#475569">يوم</div>'
+        +'</div>'
+        +'</div>'
+        +'</div>';
     });
     statsHtml+='</div></div>';
   }
