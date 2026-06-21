@@ -817,16 +817,23 @@ function doRep(){
     statsHtml+='<div style="display:flex;flex-wrap:wrap;gap:7px">';
     techList.forEach(function(tech){
       var days = techDays[tech] ? techDays[tech].length : 0;
-      statsHtml+='<div style="background:#060a12;border:1px solid #1e293b;border-radius:8px;padding:7px 12px;text-align:center;min-width:90px">'
-        +'<div style="font-size:10px;color:#475569;margin-bottom:4px">'+tech+'</div>'
-        +'<div style="display:flex;gap:10px;justify-content:center;align-items:flex-end">'
+      var avg = days > 0 ? (techCount[tech]/days).toFixed(1) : '0';
+      statsHtml+='<div style="background:#060a12;border:1px solid #1e293b;border-radius:8px;padding:8px 12px;text-align:center;min-width:100px">'
+        +'<div style="font-size:10px;color:#94a3b8;margin-bottom:6px;font-weight:600">'+tech+'</div>'
+        +'<div style="display:flex;gap:8px;justify-content:center;align-items:flex-end">'
         +'<div style="text-align:center">'
-        +'<div style="font-size:18px;font-weight:900;color:#60a5fa">'+techCount[tech]+'</div>'
-        +'<div style="font-size:9px;color:#475569">تاسك</div>'
+        +'<div style="font-size:17px;font-weight:900;color:#60a5fa">'+techCount[tech]+'</div>'
+        +'<div style="font-size:9px;color:#475569;margin-top:1px">تاسك</div>'
         +'</div>'
+        +'<div style="width:1px;background:#1e293b;margin:0 2px;align-self:stretch"></div>'
         +'<div style="text-align:center">'
-        +'<div style="font-size:18px;font-weight:900;color:#34d399">'+days+'</div>'
-        +'<div style="font-size:9px;color:#475569">يوم</div>'
+        +'<div style="font-size:17px;font-weight:900;color:#34d399">'+days+'</div>'
+        +'<div style="font-size:9px;color:#475569;margin-top:1px">يوم</div>'
+        +'</div>'
+        +'<div style="width:1px;background:#1e293b;margin:0 2px;align-self:stretch"></div>'
+        +'<div style="text-align:center">'
+        +'<div style="font-size:17px;font-weight:900;color:#f59e0b">'+avg+'</div>'
+        +'<div style="font-size:9px;color:#475569;margin-top:1px">متوسط/يوم</div>'
         +'</div>'
         +'</div>'
         +'</div>';
