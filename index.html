@@ -495,6 +495,15 @@ function byName(q){
     if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],tvf4:[],stock:[],sim55:[],track:[]};
     byN[key].sim55.push(r);
   });
+  // البحث في tracking باسم المطعم مباشرة
+  D.track.forEach(function(r){
+    var n=cv(r,'rest name');if(!n)return;
+    var s=score(n,q);if(s<=0.3)return;
+    var key=normKey(n);
+    if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],tvf4:[],stock:[],sim55:[],track:[]};
+    if(!byN[key].track.find(function(x){return x===r;}))byN[key].track.push(r);
+    if(s>byN[key].sc){byN[key].sc=s;byN[key].name=n;}
+  });
   if(!Object.keys(byN).length){noRes(q);return;}
   // ترتيب كل فرع من الأحدث
   Object.values(byN).forEach(function(br){
