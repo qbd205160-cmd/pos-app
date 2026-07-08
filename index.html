@@ -497,7 +497,7 @@ function byName(q){
   });
   // البحث في tracking باسم المطعم مباشرة
   D.track.forEach(function(r){
-    var n=cv(r,'rest name');if(!n)return;
+    var n=cv(r,'rest name','rest name ','اسم المطعم');if(!n)return;
     var s=score(n,q);if(s<=0.3)return;
     var key=normKey(n);
     if(!byN[key])byN[key]={name:n,sc:s,dash:[],tvf:[],tvf4:[],stock:[],sim55:[],track:[]};
