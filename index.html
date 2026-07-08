@@ -203,7 +203,7 @@ async function loadAll(){
 }
 
 // ── Helpers ───────────────────────────────────────────────────
-function cv(r){for(var i=1;i<arguments.length;i++){var k=arguments[i];if(r&&r[k]!==undefined&&r[k]!=='')return r[k];}return'';}
+function cv(r){for(var i=1;i<arguments.length;i++){var k=arguments[i];if(r&&r[k]!==undefined&&r[k]!=='')return r[k];if(r&&r[k+' ']!==undefined&&r[k+' ']!=='')return(r[k+' ']+'').trim();}return'';}
 function nd(s){return(s||'').toLowerCase().replace(/[\s\-]/g,'');}
 function ns(s){return(s||'').replace(/\D/g,'').replace(/^00964/,'').replace(/^964/,'').replace(/^0/,'').slice(-9);}
 
