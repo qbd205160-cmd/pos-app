@@ -440,8 +440,8 @@ function byDev(q){
   var dt=D.dash.filter(function(r){var d=nd(cv(r,'رقم جهاز POS'));return d.length>4&&d.includes(ql);}).sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
   var tt=D.tvf.concat(D.tvf4).filter(function(r){var d=nd(fdev(r)||cv(r,'رقم الجهاز'));return d.length>4&&d.includes(ql);}).sort(function(a,b){return pd(cv(b,'Timestamp'))-pd(cv(a,'Timestamp'));});
   var stk=D.stock.filter(function(r){var v=nd(cv(r,'vs','VS'));return v.length>4&&v.includes(ql);});
-  var trk=D.track.filter(function(r){return nd(cv(r,'vs')).includes(ql);});
-  if(!dt.length&&!tt.length&&!stk.length){noRes(q);return;}
+  var trk=D.track.filter(function(r){var vs=nd(cv(r,'vs','vs '));var ms=nd(cv(r,'msid','msid '));return(vs.length>4&&vs.includes(ql))||(ms.length>4&&ms.includes(ql));});
+  if(!dt.length&&!tt.length&&!stk.length&&!trk.length){noRes(q);return;}
   var name=dt.length?cv(dt[0],'اسم المطعم'):tt.length?cv(tt[0],'اسم المطعم'):'';
   var sim=dt.length?cv(dt[0],'رقم SIM كارت POS'):tt.length?cv(tt[0],'رقم السم كارت'):'';
   var si5=sim?D.sim.filter(function(r){return ns(cv(r,'ارقام'))===ns(sim);}):[];
