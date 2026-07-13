@@ -153,6 +153,19 @@ var _lastQ='';
 var _repData=[];
 
 // ── gviz ─────────────────────────────────────────────────────
+async function gvizH1(id,sheet){
+  // قراءة شيت الهيدر في الصف الأول (headers=1)
+  var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json&headers=1'+(sheet?'&sheet='+encodeURIComponent(sheet):'');
+  var r=await fetch(url);
+  var t=await r.text();
+  var j=JSON.parse(t.replace(/^[^(]+\(/,'').replace(/\);\s*$/,''));
+  var cols=(j.table.cols||[]).map(function(c){return(c.label||c.id||'').trim();});
+  return(j.table.rows||[]).map(function(row){
+    var o={};
+    (row.c||[]).forEach(function(cell,i){o[cols[i]]=(cell&&cell.v!=null)?String(cell.v).trim():'';});
+    return o;
+  }).filter(function(o){return Object.values(o).some(function(v){return v;});});
+}
 async function gviz(id,sheet){
   var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json'+(sheet?'&sheet='+encodeURIComponent(sheet):'');
   var r=await fetch(url);
@@ -186,7 +199,7 @@ async function loadAll(){
       gviz(TVF,TVF_S8).catch(function(){return [];}),
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
-      gviz(TRACK,TRACK_S).catch(function(){return [];})
+      gvizH1(TRACK,TRACK_S).catch(function(){return [];})
     ]);
     D.dash=r[0].concat(r[1]);
     D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
@@ -196,17 +209,7 @@ async function loadAll(){
     D.stock=r[8];
     D.sim=r[9];
     D.track=r[10];
-    // tracking: الصف الأول هو الهيدر - إذا أعمدة A,B,C نعالجها
-    if(D.track.length&&D.track[0]['A']!==undefined){
-      var hdr=D.track[0]; // الهيدر
-      D.track=D.track.slice(1).map(function(row){
-        var o={};
-        Object.keys(hdr).forEach(function(k){
-          if(hdr[k])o[hdr[k].trim()]=row[k]||'';
-        });
-        return o;
-      }).filter(function(o){return Object.values(o).some(function(v){return v;});});
-    }
+
     loaded=true;
     setSt('ok','✅ '+D.dash.length+' dash · '+(D.tvf.length+D.tvfR.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim');
     buildRepFilters();
