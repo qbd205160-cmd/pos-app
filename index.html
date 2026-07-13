@@ -186,7 +186,7 @@ async function loadAll(){
       gviz(TVF,TVF_S8).catch(function(){return [];}),
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
-      gviz(TRACK,TRACK_S).catch(function(){return [];})
+      gvizWithHeader(TRACK,TRACK_S).catch(function(){return [];})
     ]);
     D.dash=r[0].concat(r[1]);
     D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
@@ -437,12 +437,7 @@ function fdev(r){
 // ── By Device ────────────────────────────────────────────────
 function byDev(q){
   var ql=nd(q);
-  // DEBUG: show first tracking row keys
-  if(D.track&&D.track.length){
-    var dbg=D.track[0];
-    console.log('TRACK row keys:',Object.keys(dbg));
-    console.log('TRACK first row:',JSON.stringify(dbg));
-  }
+
   var dt=D.dash.filter(function(r){var d=nd(cv(r,'رقم جهاز POS'));return d.length>4&&d.includes(ql);}).sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
   var tt=D.tvf.concat(D.tvf4).filter(function(r){var d=nd(fdev(r)||cv(r,'رقم الجهاز'));return d.length>4&&d.includes(ql);}).sort(function(a,b){return pd(cv(b,'Timestamp'))-pd(cv(a,'Timestamp'));});
   var stk=D.stock.filter(function(r){var v=nd(cv(r,'vs','VS'));return v.length>4&&v.includes(ql);});
