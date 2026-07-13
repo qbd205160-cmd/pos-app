@@ -186,7 +186,7 @@ async function loadAll(){
       gviz(TVF,TVF_S8).catch(function(){return [];}),
       gviz(STOCK).catch(function(){return [];}),
       gviz(SIM55).catch(function(){return [];}),
-      gvizWithHeader(TRACK,TRACK_S).catch(function(){return [];})
+      gviz(TRACK,TRACK_S).catch(function(){return [];})
     ]);
     D.dash=r[0].concat(r[1]);
     D.dash.sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
@@ -196,6 +196,17 @@ async function loadAll(){
     D.stock=r[8];
     D.sim=r[9];
     D.track=r[10];
+    // tracking: الصف الأول هو الهيدر - إذا أعمدة A,B,C نعالجها
+    if(D.track.length&&D.track[0]['A']!==undefined){
+      var hdr=D.track[0]; // الهيدر
+      D.track=D.track.slice(1).map(function(row){
+        var o={};
+        Object.keys(hdr).forEach(function(k){
+          if(hdr[k])o[hdr[k].trim()]=row[k]||'';
+        });
+        return o;
+      }).filter(function(o){return Object.values(o).some(function(v){return v;});});
+    }
     loaded=true;
     setSt('ok','✅ '+D.dash.length+' dash · '+(D.tvf.length+D.tvfR.length)+' TVF · '+D.stock.length+' stock · '+D.sim.length+' sim');
     buildRepFilters();
