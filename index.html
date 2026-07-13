@@ -442,8 +442,14 @@ function byDev(q){
   var stk=D.stock.filter(function(r){var v=nd(cv(r,'vs','VS'));return v.length>4&&v.includes(ql);});
   var trk=D.track.filter(function(r){var vs=nd(cv(r,'vs','vs '));var ms=nd(cv(r,'msid','msid '));return(vs.length>4&&vs.includes(ql))||(ms.length>4&&ms.includes(ql));});
   if(!dt.length&&!tt.length&&!stk.length&&!trk.length){noRes(q);return;}
-  var name=dt.length?cv(dt[0],'اسم المطعم'):tt.length?cv(tt[0],'اسم المطعم'):'';
-  var sim=dt.length?cv(dt[0],'رقم SIM كارت POS'):tt.length?cv(tt[0],'رقم السم كارت'):'';
+  var name=dt.length?cv(dt[0],'اسم المطعم')
+          :tt.length?cv(tt[0],'اسم المطعم')
+          :trk.length?cv(trk[0],'rest name','rest name ')
+          :'';
+  var sim=dt.length?cv(dt[0],'رقم SIM كارت POS')
+         :tt.length?cv(tt[0],'رقم السم كارت')
+         :trk.length?cv(trk[0],'msid','msid ')
+         :'';
   var si5=sim?D.sim.filter(function(r){return ns(cv(r,'ارقام'))===ns(sim);}):[];
   document.getElementById('res').innerHTML=buildCard({name:name||q,dev:q,sim:sim,dash:dt,tvf:tt,stock:stk,sim55:si5,track:trk})+'<button class="ebtn">📥 CSV</button>';
 }
