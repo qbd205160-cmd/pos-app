@@ -219,7 +219,24 @@ async function loadAll(){
 // ── Helpers ───────────────────────────────────────────────────
 function cv(r){for(var i=1;i<arguments.length;i++){var k=arguments[i];if(r&&r[k]!==undefined&&r[k]!=='')return r[k];if(r&&r[k+' ']!==undefined&&r[k+' ']!=='')return(r[k+' ']+'').trim();}return'';}
 function nd(s){return(s||'').toLowerCase().replace(/[\s\-]/g,'');}
-function ns(s){return String(s||'').replace(/\.0+$/,'').replace(/\D/g,'').replace(/^00964/,'').replace(/^964/,'').replace(/^0/,'').slice(-9);}
+function ns(s){
+  // تنظيف الرقم: إزالة .0 والرموز وكود الدولة والصفر البادئ
+  var c=String(s||'').replace(/\.0+$/,'').replace(/\D/g,'');
+  c=c.replace(/^00964/,'').replace(/^964/,'').replace(/^0/,'');
+  return c;
+}
+function simMatch(a,b){
+  // مقارنة رقمين سيم بكل الاحتمالات
+  var na=ns(a), nb=ns(b);
+  if(!na||!nb||na.length<7||nb.length<7)return false;
+  // تطابق كامل
+  if(na===nb)return true;
+  // أحدهما نهاية الآخر
+  if(na.endsWith(nb)||nb.endsWith(na))return true;
+  // آخر 9 أرقام
+  if(na.slice(-9)===nb.slice(-9))return true;
+  return false;
+}
 
 function pd(s){
   if(!s)return new Date(0);
@@ -480,10 +497,10 @@ function byDev(q){
 // ── By SIM ───────────────────────────────────────────────────
 function bySim(q){
   var nq=ns(q);
-  var dt=D.dash.filter(function(r){return ns(cv(r,'رقم SIM كارت POS'))===nq;}).sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
-  var tt=D.tvf.concat(D.tvf4).filter(function(r){return ns(cv(r,'رقم السم كارت','SIM number','رقم السم كارت '))===nq;});
-  var si5=D.sim.filter(function(r){return ns(cv(r,'ارقام','ارقام '))===nq;});
-  var trk=D.track.filter(function(r){return ns(cv(r,'msid'))===nq;});
+  var dt=D.dash.filter(function(r){return simMatch(cv(r,'رقم SIM كارت POS'),q);}).sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
+  var tt=D.tvf.concat(D.tvf4).filter(function(r){return simMatch(cv(r,'رقم السم كارت','رقم السم كارت ','SIM number'),q);});
+  var si5=D.sim.filter(function(r){return simMatch(cv(r,'ارقام','ارقام '),q);});
+  var trk=D.track.filter(function(r){return simMatch(cv(r,'msid'),q);});
   if(!dt.length&&!tt.length&&!si5.length&&!trk.length){noRes(q);return;}
   // ابحث عن الاسم من أي مصدر
   var name=dt.length?cv(dt[0],'اسم المطعم')
