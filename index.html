@@ -175,7 +175,7 @@ async function gviz(id,sheet){
   return(j.table.rows||[]).map(function(row){
     var o={};
     (row.c||[]).forEach(function(cell,i){
-      o[cols[i]]=cell&&cell.v!=null?String(cell.v).trim():'';
+      o[cols[i]]=cell?(cell.f!=null?String(cell.f).trim():(cell.v!=null?String(cell.v).trim():'')):'';
     });
     return o;
   }).filter(function(o){return Object.values(o).some(function(v){return v;});});
