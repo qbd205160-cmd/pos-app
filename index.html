@@ -481,18 +481,26 @@ function byDev(q){
 function bySim(q){
   var nq=ns(q);
   var dt=D.dash.filter(function(r){return ns(cv(r,'رقم SIM كارت POS'))===nq;}).sort(function(a,b){return pd(cv(b,'submittedAt'))-pd(cv(a,'submittedAt'));});
-  var tt=D.tvf.concat(D.tvf4).filter(function(r){return ns(cv(r,'رقم السم كارت','SIM number','ارقام'))===nq;});
-  var si5=D.sim.filter(function(r){return ns(cv(r,'ارقام'))===nq;});
+  var tt=D.tvf.concat(D.tvf4).filter(function(r){return ns(cv(r,'رقم السم كارت','SIM number','رقم السم كارت '))===nq;});
+  var si5=D.sim.filter(function(r){return ns(cv(r,'ارقام','ارقام '))===nq;});
   var trk=D.track.filter(function(r){return ns(cv(r,'msid'))===nq;});
   if(!dt.length&&!tt.length&&!si5.length&&!trk.length){noRes(q);return;}
+  // ابحث عن الاسم من أي مصدر
   var name=dt.length?cv(dt[0],'اسم المطعم')
-          :tt.length?cv(tt[0],'اسم المطعم')
           :si5.length?cv(si5[0],'اسم المطعم')
           :trk.length?cv(trk[0],'rest name')
           :'';
-  // إذا وجدنا اسم المطعم — ابحث عنه كاملاً
+  // إذا ما وجدنا الاسم من dashboard/sim55/tracking، جرب عبر رقم الجهاز من TVF
+  if(!name&&tt.length){
+    var devFromTvf=cv(tt[0],'رقم الجهاز','رقم الجهاز ');
+    if(devFromTvf&&devFromTvf.length>4){
+      var dtFromDev=D.dash.filter(function(r){return nd(cv(r,'رقم جهاز POS'))===nd(devFromTvf);});
+      if(dtFromDev.length){name=cv(dtFromDev[0],'اسم المطعم');dt=dtFromDev;}
+    }
+  }
+  // إذا وجدنا الاسم — ابحث عنه كاملاً
   if(name&&name.length>1){byName(name);return;}
-  var dev=dt.length?cv(dt[0],'رقم جهاز POS'):trk.length?cv(trk[0],'vs'):'';
+  var dev=dt.length?cv(dt[0],'رقم جهاز POS'):tt.length?cv(tt[0],'رقم الجهاز','رقم الجهاز '):trk.length?cv(trk[0],'vs'):'';
   document.getElementById('res').innerHTML=buildCard({name:name||q,dev:dev,sim:q,dash:dt,tvf:tt,stock:[],sim55:si5,track:trk})+'<button class="ebtn">📥 CSV</button>';
 }
 
