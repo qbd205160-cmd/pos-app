@@ -166,7 +166,7 @@ async function gvizH1(id,sheet){
     return o;
   }).filter(function(o){return Object.values(o).some(function(v){return v;});});
 }
-async async function gvizCSV(id,sheet){
+async function gvizCSV(id,sheet){
   // قراءة CSV تحافظ على الأرقام كنص بدون فقدان الأصفار
   var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv'+(sheet?'&sheet='+encodeURIComponent(sheet):'');
   var r=await fetch(url);
