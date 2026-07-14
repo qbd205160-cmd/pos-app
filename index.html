@@ -166,7 +166,33 @@ async function gvizH1(id,sheet){
     return o;
   }).filter(function(o){return Object.values(o).some(function(v){return v;});});
 }
-async function gviz(id,sheet){
+async async function gvizCSV(id,sheet){
+  // قراءة CSV تحافظ على الأرقام كنص بدون فقدان الأصفار
+  var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv'+(sheet?'&sheet='+encodeURIComponent(sheet):'');
+  var r=await fetch(url);
+  var t=await r.text();
+  var lines=t.trim().split('\n');
+  if(lines.length<2)return[];
+  function parseCSVLine(line){
+    var result=[],cur='',inQ=false;
+    for(var i=0;i<line.length;i++){
+      var c=line[i];
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){result.push(cur.trim());cur='';}
+      else{cur+=c;}
+    }
+    result.push(cur.trim());
+    return result;
+  }
+  var cols=parseCSVLine(lines[0]).map(function(c){return c.replace(/^"|"$/g,'').trim();});
+  return lines.slice(1).map(function(line){
+    var vals=parseCSVLine(line);
+    var o={};
+    cols.forEach(function(col,i){o[col]=(vals[i]||'').replace(/^"|"$/g,'').trim();});
+    return o;
+  }).filter(function(o){return Object.values(o).some(function(v){return v;});});
+}
+function gviz(id,sheet){
   var url='https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:json'+(sheet?'&sheet='+encodeURIComponent(sheet):'');
   var r=await fetch(url);
   var t=await r.text();
@@ -501,9 +527,6 @@ function bySim(q){
   var tt=D.tvf.concat(D.tvf4).filter(function(r){return simMatch(cv(r,'رقم السم كارت','رقم السم كارت ','SIM number'),q);});
   var si5=D.sim.filter(function(r){return simMatch(cv(r,'ارقام','ارقام '),q);});
   var trk=D.track.filter(function(r){return simMatch(cv(r,'msid'),q);});
-  // DEBUG
-  console.log('TVF first 3 sim values:',D.tvf.slice(0,3).map(function(r){return r['رقم السم كارت'];}));
-  console.log('dt='+dt.length,'tt='+tt.length,'si5='+si5.length,'trk='+trk.length);
   if(!dt.length&&!tt.length&&!si5.length&&!trk.length){noRes(q);return;}
   // ابحث عن الاسم من أي مصدر
   var name=dt.length?cv(dt[0],'اسم المطعم')
