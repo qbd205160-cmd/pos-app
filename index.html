@@ -533,26 +533,28 @@ function bySim(q){
           :si5.length?cv(si5[0],'اسم المطعم')
           :trk.length?cv(trk[0],'rest name')
           :'';
-  // جرب الاسم من TVF (FR2/FR4 يحتوي اسم المطعم)
+  // ابحث عن الاسم من TVF (FR2/FR4 فيه اسم المطعم)
   if(!name&&tt.length){
-    // ابحث في كل tt عن اسم المطعم
     for(var ti=0;ti<tt.length;ti++){
       var tn=cv(tt[ti],'اسم المطعم');
       if(tn&&tn.length>1){name=tn;break;}
     }
   }
-  // إذا ما وجدنا الاسم، جرب عبر رقم الجهاز من TVF FR1
-  if(!name&&tt.length){
-    var devFromTvf=cv(tt[0],'رقم الجهاز','رقم الجهاز ','POS number');
-    if(devFromTvf&&devFromTvf.length>4){
-      var dtFromDev=D.dash.filter(function(r){return nd(cv(r,'رقم جهاز POS'))===nd(devFromTvf);});
-      if(dtFromDev.length){name=cv(dtFromDev[0],'اسم المطعم');}
-    }
-  }
-  // إذا وجدنا الاسم — ابحث عنه كاملاً في كل الشيتات
-  if(name&&name.length>1){byName(name);return;}
-  var dev=dt.length?cv(dt[0],'رقم جهاز POS'):tt.length?cv(tt[0],'رقم الجهاز','POS number'):trk.length?cv(trk[0],'vs'):'';
-  document.getElementById('res').innerHTML=buildCard({name:name||q,dev:dev,sim:q,dash:dt,tvf:tt,stock:[],sim55:si5,track:trk})+'<button class="ebtn">📥 CSV</button>';
+  // ابحث عن رقم الجهاز
+  var dev=dt.length?cv(dt[0],'رقم جهاز POS')
+         :tt.length?cv(tt[0],'POS number','رقم الجهاز','رقم الجهاز ')
+         :trk.length?cv(trk[0],'vs'):'';
+  // فصّل tt إلى tvf (FR1) و tvf4 (FR2/FR4/S6/S7/S8)
+  var tvf1=tt.filter(function(r){return !cv(r,'اسم المطعم');});
+  var tvf4=tt.filter(function(r){return !!cv(r,'اسم المطعم');});
+  // اسم من أفضل مصدر
+  if(!name&&dt.length) name=cv(dt[0],'اسم المطعم');
+  // عرض الكارت مباشرة مع كل البيانات
+  document.getElementById('res').innerHTML=buildCard({
+    name:name||q, dev:dev, sim:q,
+    dash:dt, tvf:tvf1, tvf4:tvf4,
+    stock:[], sim55:si5, track:trk
+  })+'<button class="ebtn">📥 CSV</button>';
 }
 
 // ── By Name ──────────────────────────────────────────────────
