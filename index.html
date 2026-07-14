@@ -484,8 +484,9 @@ function bySim(q){
   var tt=D.tvf.concat(D.tvf4).filter(function(r){return ns(cv(r,'رقم السم كارت','SIM number','رقم السم كارت '))===nq;});
   var si5=D.sim.filter(function(r){return ns(cv(r,'ارقام','ارقام '))===nq;});
   var trk=D.track.filter(function(r){return ns(cv(r,'msid'))===nq;});
+  // debug: show TVF keys
+  if(D.tvf&&D.tvf.length)console.log('TVF keys:',Object.keys(D.tvf[0]));
   console.log('bySim nq='+nq,'dt='+dt.length,'tt='+tt.length,'si5='+si5.length,'trk='+trk.length);
-  if(tt.length)console.log('TVF sim found:',JSON.stringify(tt[0]));
   if(!dt.length&&!tt.length&&!si5.length&&!trk.length){noRes(q);return;}
   // ابحث عن الاسم من أي مصدر
   var name=dt.length?cv(dt[0],'اسم المطعم')
