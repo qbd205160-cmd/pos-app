@@ -527,7 +527,8 @@ function bySim(q){
   var tt=D.tvf.concat(D.tvf4).filter(function(r){return simMatch(cv(r,'رقم السم كارت','رقم السم كارت ','SIM number'),q);});
   var si5=D.sim.filter(function(r){return simMatch(cv(r,'ارقام','ارقام '),q);});
   var trk=D.track.filter(function(r){return simMatch(cv(r,'msid'),q);});
-  console.log('TVF sim samples:',D.tvf.slice(0,5).map(function(r){return r['رقم السم كارت'];}));
+  console.log('TVF row0:',JSON.stringify(D.tvf[0]));
+  console.log('TVF keys:',D.tvf[0]?Object.keys(D.tvf[0]):[]);
   console.log('dt='+dt.length+' tt='+tt.length+' si5='+si5.length+' trk='+trk.length);
   if(!dt.length&&!tt.length&&!si5.length&&!trk.length){noRes(q);return;}
   // ابحث عن الاسم من أي مصدر
