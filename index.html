@@ -675,11 +675,19 @@ function renderNameCard(br){
 function buildCard(data){
   var t=latestDash(data)||null;
   var tv=data.tvf&&data.tvf.length?data.tvf[0]:null;
-  var tv4=data.tvf4&&data.tvf4.length?data.tvf4.sort(function(a,b){return pd(cv(b,'الطابع الزمني','Timestamp'))-pd(cv(a,'الطابع الزمني','Timestamp'));})[0]:null;
+  // ترتيب tvf4 من الأحدث
+  var tv4All=(data.tvf4||[]).concat(data.tvfR||[]);
+  tv4All.sort(function(a,b){return pd(cv(b,'الطابع الزمني','Timestamp'))-pd(cv(a,'الطابع الزمني','Timestamp'));});
+  var tv4=tv4All.length?tv4All[0]:null;
   var stk=data.stock&&data.stock.length?data.stock[0]:null;
   var si=data.sim55&&data.sim55.length?data.sim55[0]:null;
+  // اختر أحدث مصدر: dashboard أو TVF4
+  var tDate=t?pd(cv(t,'submittedAt')):new Date(0);
+  var tv4Date=tv4?pd(cv(tv4,'الطابع الزمني','Timestamp')):new Date(0);
+  // إذا TVF4 أحدث من dashboard استخدمه كمصدر رئيسي
+  var useTV4=tv4&&tv4Date>tDate;
 
-  var dev=data.dev||(t?cv(t,'رقم جهاز POS'):tv4?cv(tv4,'POS number'):tv?fdev(tv):stk?cv(stk,'vs','VS'):'');
+  var dev=data.dev||(useTV4?cv(tv4,'POS number'):t?cv(t,'رقم جهاز POS'):tv4?cv(tv4,'POS number'):tv?fdev(tv):stk?cv(stk,'vs','VS'):'');
   var sim=data.sim||(t?cv(t,'رقم SIM كارت POS'):tv4?cv(tv4,'SIM number'):tv?cv(tv,'رقم السم كارت'):si?cv(si,'ارقام'):'');
   var name=data.name||'';
   var addr=t?cv(t,'العنوان'):'';
