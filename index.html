@@ -217,7 +217,7 @@ async function loadAll(){
     var r=await Promise.all([
       gviz(DASH).catch(function(){return [];}),
       gviz(DASH,'ورقة1').catch(function(){return [];}),
-      gviz(TVF).catch(function(){return [];}),
+      gvizCSV(TVF,TVF_FR1).catch(function(){return [];}),
       gviz(TVF,TVF_FR2).catch(function(){return [];}),
       gviz(TVF,TVF_FR4).catch(function(){return [];}),
       gviz(TVF,TVF_S6).catch(function(){return [];}),
