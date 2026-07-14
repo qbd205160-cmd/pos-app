@@ -508,16 +508,19 @@ function byDev(q){
          :tt.length?cv(tt[0],'رقم السم كارت')
          :trk.length?cv(trk[0],'msid','msid ')
          :'';
-  var si5=sim?D.sim.filter(function(r){return ns(cv(r,'ارقام'))===ns(sim);}):[];
-  // إذا وجدنا اسم المطعم من tracking، ابحث عنه كاملاً في كل الشيتات
-  if(!name&&trk.length){
-    var trkName=cv(trk[0],'rest name');
-    if(trkName&&trkName.length>1){byName(trkName);return;}
-  }
-  // إذا وجدنا اسم من dashboard أو TVF، ابحث عنه كاملاً
-  if(name&&name.length>1){byName(name);return;}
-  // إذا ما وجدنا اسم — اعرض ما عندنا
-  document.getElementById('res').innerHTML=buildCard({name:name||q,dev:q,sim:sim,dash:dt,tvf:tt,stock:stk,sim55:si5,track:trk})+'<button class="ebtn">📥 CSV</button>';
+  var si5=sim?D.sim.filter(function(r){return simMatch(cv(r,'ارقام'),sim);}):[];
+  // فصّل tt إلى tvf1 و tvf4
+  var tvf1=tt.filter(function(r){return !cv(r,'اسم المطعم');});
+  var tvf4=tt.filter(function(r){return !!cv(r,'اسم المطعم');});
+  // اسم من أفضل مصدر
+  if(!name&&tvf4.length) name=cv(tvf4[0],'اسم المطعم');
+  if(!name&&trk.length) name=cv(trk[0],'rest name');
+  // عرض الكارت مباشرة مع كل البيانات
+  document.getElementById('res').innerHTML=buildCard({
+    name:name||q, dev:q, sim:sim,
+    dash:dt, tvf:tvf1, tvf4:tvf4,
+    stock:stk, sim55:si5, track:trk
+  })+'<button class="ebtn">📥 CSV</button>';
 }
 
 // ── By SIM ───────────────────────────────────────────────────
