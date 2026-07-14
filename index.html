@@ -466,6 +466,14 @@ function byDev(q){
          :trk.length?cv(trk[0],'msid','msid ')
          :'';
   var si5=sim?D.sim.filter(function(r){return ns(cv(r,'ارقام'))===ns(sim);}):[];
+  // إذا وجدنا اسم المطعم من tracking، ابحث عنه كاملاً في كل الشيتات
+  if(!name&&trk.length){
+    var trkName=cv(trk[0],'rest name');
+    if(trkName&&trkName.length>1){byName(trkName);return;}
+  }
+  // إذا وجدنا اسم من dashboard أو TVF، ابحث عنه كاملاً
+  if(name&&name.length>1){byName(name);return;}
+  // إذا ما وجدنا اسم — اعرض ما عندنا
   document.getElementById('res').innerHTML=buildCard({name:name||q,dev:q,sim:sim,dash:dt,tvf:tt,stock:stk,sim55:si5,track:trk})+'<button class="ebtn">📥 CSV</button>';
 }
 
